@@ -7,7 +7,7 @@ import streamlit as st
 from shared import (
     GLOBAL_CSS, ROLES,
     render_sidebar,
-    shortform_strategy, generate_shortform_script, generate_ab_test,
+    shortform_strategy, generate_shortform_script, generate_ab_test, render_tts_control,
 )
 
 st.set_page_config(
@@ -94,6 +94,7 @@ with tab_strategy:
         st.download_button("⬇ 전략 TXT 다운로드",
             data=st.session_state["shortform_result"],
             file_name="able_sf_strategy.txt", mime="text/plain")
+        render_tts_control(st.session_state["shortform_result"], "tts_sf_strategy")
     else:
         st.info("전략 생성 버튼을 눌러주세요.")
 
@@ -116,6 +117,7 @@ with tab_script:
         st.download_button("⬇ 스크립트 TXT 다운로드",
             data=st.session_state["script_result"],
             file_name="able_script.txt", mime="text/plain")
+        render_tts_control(st.session_state["script_result"], "tts_sf_script")
     else:
         st.info("스크립트 생성 버튼을 눌러주세요.")
 
@@ -133,5 +135,6 @@ with tab_ab:
         st.download_button("⬇ A/B 아이디어 TXT 다운로드",
             data=st.session_state["ab_result"],
             file_name="able_ab.txt", mime="text/plain")
+        render_tts_control(st.session_state["ab_result"], "tts_sf_ab")
     else:
         st.info("생성 버튼을 눌러주세요.")

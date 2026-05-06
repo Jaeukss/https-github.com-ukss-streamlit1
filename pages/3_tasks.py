@@ -47,6 +47,24 @@ st.markdown("""
     display: inline-block; border-radius: 20px; padding: 2px 10px;
     font-size: 0.68rem; font-weight: 700;
 }
+.flow-grid { display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap:12px; margin-top:0.8rem; }
+.flow-col { background:#FFFFFF; border:1px solid #E5DDF7; border-radius:14px; padding:0.95rem; min-height:180px; }
+.flow-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem; }
+.flow-title { font-size:0.82rem; font-weight:800; color:#211A32; }
+.flow-count { font-size:0.7rem; font-weight:800; color:#7C5CFF; background:#F1ECFF; border:1px solid #DED2FF; border-radius:999px; padding:2px 8px; }
+.flow-item { background:#FAF8FF; border:1px solid #ECE6FB; border-radius:12px; padding:0.75rem 0.8rem; margin-bottom:0.55rem; }
+.flow-item-title { font-size:0.8rem; font-weight:800; color:#211A32; line-height:1.4; }
+.flow-item-meta { font-size:0.7rem; color:#6F6682; margin-top:0.35rem; line-height:1.5; }
+.person-flow { background:#FFFFFF; border:1px solid #E5DDF7; border-radius:14px; padding:1rem 1.1rem; margin-bottom:0.65rem; }
+.person-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:0.55rem; }
+.person-name { font-size:0.86rem; font-weight:800; color:#211A32; }
+.person-stats { font-size:0.72rem; color:#6F6682; }
+.flow-progress { background:#F1ECFF; border-radius:999px; height:8px; overflow:hidden; }
+.flow-progress-fill { background:linear-gradient(90deg,#7C5CFF,#17A976); height:100%; border-radius:999px; }
+.next-action { background:#FFFFFF; border:1px solid #E5DDF7; border-radius:14px; padding:1rem 1.1rem; margin-bottom:0.7rem; color:#211A32; }
+.next-action strong { color:#7C5CFF; }
+@media (max-width: 900px) { .flow-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .flow-grid { grid-template-columns: 1fr; } }
 </style>
 """, unsafe_allow_html=True)
 
@@ -174,9 +192,9 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════
-# TWO VIEWS: 편집 테이블 | 카드 보기
+# THREE VIEWS: 편집 테이블 | 카드 보기 | 업무 흐름
 # ══════════════════════════════════════════════════════════════
-view_tab1, view_tab2 = st.tabs(["📊 편집 테이블", "🗂️ 카드 보기"])
+view_tab1, view_tab2, view_tab3 = st.tabs(["📊 편집 테이블", "🗂️ 카드 보기", "🔄 업무 흐름"])
 
 # ── 편집 테이블 ──
 with view_tab1:
@@ -247,3 +265,71 @@ with view_tab2:
                     if st.button(f"→ {next_s}", key=f"move_{tid}_{i}", use_container_width=True):
                         move_status(tid)
                         st.rerun()
+
+# ── 업무 흐름 ──
+with view_tab3:
+    st.caption("업무가 진행 예정 → 진행 중 → 검토 중 → 완료로 어떻게 흘러가는지 한눈에 확인합니다.")
+
+    flow_statuses = ["진행 예정", "진행 중", "검토 중", "완료"]
+    st.markdown('<div class="flow-grid">', unsafe_allow_html=True)
+    for status in flow_statuses:
+        sub = df_all[df_all["status"] == status]
+        sc = status_color(status)
+        st.markdown(
+            f'<div class="flow-col">'
+            f'<div class="flow-head"><div class="flow-title" style="color:{sc};">{status}</div><div class="flow-count">{len(sub)}</div></div>',
+            unsafe_allow_html=True,
+        )
+        if sub.empty:
+            st.markdown('<div style="font-size:0.76rem;color:#9A90AD;padding:0.4rem 0;">해당 업무 없음</div>', unsafe_allow_html=True)
+        else:
+            for _, row in sub.head(6).iterrows():
+                pstyle, picon = priority_style(row.get("priority", ""))
+                st.markdown(
+                    f'<div class="flow-item">'
+                    f'<div class="flow-item-title">{row.get("title", "")}</div>'
+                    f'<div class="flow-item-meta">👤 {row.get("assignee", "미정")} · 📅 {row.get("due_date", "미정")}<br>'
+                    f'<span style="{pstyle}">{picon} {row.get("priority", "")}</span></div>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+            if len(sub) > 6:
+                st.markdown(f'<div style="font-size:0.72rem;color:#6F6682;">외 {len(sub)-6}개 더 있음</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("#### 담당자별 진행 흐름")
+    assignee_df = df_all.copy()
+    assignee_df["assignee"] = assignee_df["assignee"].replace("", "미정").fillna("미정")
+    for assignee, group in assignee_df.groupby("assignee", dropna=False):
+        g_total = len(group)
+        g_done = len(group[group["status"] == "완료"])
+        g_doing = len(group[group["status"] == "진행 중"])
+        g_review = len(group[group["status"] == "검토 중"])
+        g_todo = len(group[group["status"] == "진행 예정"])
+        g_pct = int(g_done / g_total * 100) if g_total else 0
+        st.markdown(
+            f'<div class="person-flow">'
+            f'<div class="person-top"><div class="person-name">👤 {assignee}</div>'
+            f'<div class="person-stats">진행 예정 {g_todo} · 진행 중 {g_doing} · 검토 중 {g_review} · 완료 {g_done}</div></div>'
+            f'<div class="flow-progress"><div class="flow-progress-fill" style="width:{g_pct}%;"></div></div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("#### 다음 액션 추천")
+    recommendations = []
+    if high_p and len(df_all[(df_all["priority"] == "높음") & (df_all["status"] == "진행 예정")]) > 0:
+        recommendations.append("<strong>높은 우선순위</strong>인데 아직 진행 예정인 업무가 있습니다. 먼저 착수할 항목을 정해보세요.")
+    if review >= 3:
+        recommendations.append("<strong>검토 중</strong> 업무가 3개 이상입니다. 의사결정자 확인이 지연되고 있는지 점검해보세요.")
+    if doing == 0 and todo > 0:
+        recommendations.append("진행 중인 업무가 없습니다. 오늘 바로 시작할 업무를 1~2개 지정하면 흐름이 살아납니다.")
+    if pct_done >= 70:
+        recommendations.append("완료율이 높습니다. 남은 검토/마무리 업무를 정리하면 프로젝트 종료 단계로 넘어갈 수 있습니다.")
+    if not recommendations:
+        recommendations.append("현재 업무 흐름이 안정적입니다. 진행 중 업무의 마감일과 담당자만 주기적으로 확인하세요.")
+
+    for rec in recommendations:
+        st.markdown(f'<div class="next-action">💡 {rec}</div>', unsafe_allow_html=True)
+

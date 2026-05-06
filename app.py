@@ -42,10 +42,10 @@ html, body, [class*="css"] {
 /* ── LOGIN LAYOUT ── */
 .login-root {
     display: flex;
-    min-height: calc(100vh - 12px);
+    min-height: 100vh;
     align-items: center;
     justify-content: center;
-    padding: 0.6rem 1rem 0.9rem;
+    padding: 1.2rem 1rem;
 }
 .login-card {
     width: 100%;
@@ -53,11 +53,11 @@ html, body, [class*="css"] {
 }
 .login-logo {
     text-align: center;
-    margin-bottom: 1.35rem;
+    margin-bottom: 1.4rem;
 }
 .login-wordmark {
     font-family: 'Syne', sans-serif;
-    font-size: 2.75rem;
+    font-size: 2.8rem;
     font-weight: 800;
     background: linear-gradient(120deg, #C4A8FF 0%, #E94C98 100%);
     -webkit-background-clip: text;
@@ -78,7 +78,7 @@ html, body, [class*="css"] {
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #6F6682;
-    margin-bottom: 0.55rem;
+    margin-bottom: 0.9rem;
 }
 
 /* ── ROLE CARDS ── */
@@ -119,11 +119,11 @@ html, body, [class*="css"] {
     font-family: 'Pretendard', sans-serif !important;
     font-size: 0.92rem !important;
     font-weight: 600 !important;
-    padding: 0.78rem 1.1rem !important;
+    padding: 0.8rem 1.1rem !important;
     width: 100% !important;
     text-align: left !important;
     transition: all 0.18s !important;
-    margin-bottom: 0.32rem !important;
+    margin-bottom: 0.4rem !important;
 }
 .stButton > button:hover {
     background: #F2ECFF !important;
@@ -138,7 +138,7 @@ html, body, [class*="css"] {
 /* ── FOOTER ── */
 .login-footer {
     text-align: center;
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
     font-size: 0.72rem;
     color: #9B92AD;
     letter-spacing: 0.05em;

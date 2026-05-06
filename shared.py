@@ -4,6 +4,8 @@
 import os
 import re
 import json
+import tempfile
+from pathlib import Path
 import streamlit as st
 from openai import OpenAI
 
@@ -74,7 +76,7 @@ def get_secret(key, default=None):
 
 OPENAI_API_KEY   = get_secret("OPENAI_API_KEY")
 SENDGRID_API_KEY = get_secret("SENDGRID_API_KEY")
-EMAIL_ADDRESS    = get_secret("EMAIL_ADDRESS", "mememeco8@gmail.com")
+EMAIL_ADDRESS    = "mememeco8@gmail.com"  # SendGrid Verified Sender Identity
 
 def get_openai_client():
     if not OPENAI_API_KEY:
@@ -96,6 +98,75 @@ RESULT_KEYS = [
 def clear_results():
     for k in RESULT_KEYS:
         st.session_state.pop(k, None)
+
+
+# ══════════════════════════════════════════════════════════════
+# AUDIO HELPERS (STT / TTS)
+# ══════════════════════════════════════════════════════════════
+def transcribe_audio_file(audio_file) -> str:
+    """음성 파일을 회의록 텍스트로 변환합니다. st.audio_input 또는 업로드 파일을 받습니다."""
+    if audio_file is None:
+        return ""
+    client = get_openai_client()
+    name = getattr(audio_file, "name", "meeting_audio.wav") or "meeting_audio.wav"
+    suffix = Path(name).suffix or ".wav"
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        tmp.write(audio_file.getvalue())
+        tmp_path = tmp.name
+    try:
+        with open(tmp_path, "rb") as f:
+            transcript = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=f,
+                language="ko",
+            )
+        return getattr(transcript, "text", "") or ""
+    finally:
+        try:
+            os.remove(tmp_path)
+        except Exception:
+            pass
+
+
+def synthesize_speech(text: str, voice: str = "alloy") -> bytes:
+    """분석 결과 텍스트를 음성 파일(mp3 bytes)로 변환합니다."""
+    if not text or not str(text).strip():
+        return b""
+    client = get_openai_client()
+    clean_text = str(text).strip()
+    # TTS 입력이 너무 길면 실패할 수 있어 앞부분 중심으로 읽습니다.
+    if len(clean_text) > 3800:
+        clean_text = clean_text[:3800] + "\n\n이후 내용은 화면에서 확인해주세요."
+    resp = client.audio.speech.create(
+        model="tts-1",
+        voice=voice,
+        input=clean_text,
+    )
+    if hasattr(resp, "content"):
+        return resp.content
+    return resp.read()
+
+
+def render_tts_control(text: str, key: str, label: str = "🔊 결과 음성으로 듣기"):
+    """결과 영역 하단에 작게 붙이는 TTS 컨트롤입니다."""
+    if not text or not str(text).strip():
+        return
+    with st.expander(label, expanded=False):
+        c1, c2 = st.columns([1, 3])
+        with c1:
+            voice = st.selectbox(
+                "음성",
+                ["alloy", "nova", "shimmer", "echo", "fable", "onyx"],
+                index=1,
+                key=f"{key}_voice",
+                label_visibility="collapsed",
+            )
+        with c2:
+            if st.button("음성 생성", key=f"{key}_make", use_container_width=True):
+                with st.spinner("음성 생성 중…"):
+                    st.session_state[f"{key}_audio"] = synthesize_speech(text, voice)
+        if st.session_state.get(f"{key}_audio"):
+            st.audio(st.session_state[f"{key}_audio"], format="audio/mp3")
 
 # ══════════════════════════════════════════════════════════════
 # AI CORE
@@ -332,6 +403,7 @@ textarea:focus, input:focus {
     box-shadow: 0 0 0 3px rgba(99,85,180,0.12) !important;
 }
 .stSelectbox > div { background: #FFFFFF !important; border: 1px solid #E5DDF7 !important; border-radius: 10px !important; }
+.stSelectbox [data-baseweb="select"] > div { min-height: 46px !important; }
 
 /* ── BUTTONS ── */
 .stButton > button {
@@ -340,6 +412,7 @@ textarea:focus, input:focus {
     font-family: 'Pretendard', sans-serif !important;
     font-size: 0.85rem !important; font-weight: 600 !important;
     padding: 0.5rem 1.1rem !important;
+    min-height: 46px !important;
     transition: all 0.15s !important;
 }
 .stButton > button:hover {
@@ -377,6 +450,7 @@ section[data-testid="stSidebar"] .stButton > button {
     background: #FFFFFF !important; border-radius: 12px !important;
     gap: 2px !important; padding: 4px !important;
     border: 1px solid #E5DDF7 !important;
+    margin-top: 0.2rem !important;
 }
 .stTabs [data-baseweb="tab"] {
     background: transparent !important; color: #6F6682 !important;
@@ -429,6 +503,16 @@ hr { border-color: #E6DDF7 !important; }
 /* progress bar */
 .prog-wrap { background: #F1ECFF; border-radius: 6px; height: 8px; overflow: hidden; margin: 6px 0 14px; }
 .prog-fill { background: linear-gradient(90deg, #7C5CFF, #E94C98); height: 100%; border-radius: 6px; transition: width 0.4s; }
+
+
+/* ── TOP ACTION ALIGNMENT / AUDIO AREAS ── */
+.audio-box {
+    background:#FFFFFF; border:1px dashed #D5C8EE; border-radius:12px;
+    padding:0.9rem 1rem; margin:0.6rem 0 0.8rem;
+}
+.audio-help { font-size:0.76rem; color:#766D8A; margin-bottom:0.45rem; }
+[data-testid="stHorizontalBlock"] { align-items: center; }
+.stTabs [data-baseweb="tab-list"] { margin-top: 0.4rem !important; }
 </style>
 """
 

@@ -12,7 +12,7 @@ from shared import (
     render_sidebar, clear_results, extract_keywords, summarize_meeting, extract_tasks_ai,
     branding_insight, action_and_risk, decisions, ask_able, generate_notify_messages,
     make_email_draft, compare_meetings, extract_tasks_structured, add_tasks_to_state,
-    fetch_related_news, RESULT_KEYS,
+    fetch_related_news, transcribe_audio_file, render_tts_control, RESULT_KEYS,
 )
 
 st.set_page_config(
@@ -64,6 +64,34 @@ with st.container():
             clear_results()
             st.rerun()
 
+    # STT는 회의록 입력 바로 위가 가장 자연스럽습니다.
+    # 음성 회의/녹음 파일 → 텍스트 회의록 → 기존 분석 흐름으로 이어집니다.
+    with st.expander("🎙️ 음성 입력 / STT", expanded=False):
+        st.caption("마이크로 녹음하거나 음성 파일을 올리면 회의록 입력창에 텍스트로 반영됩니다.")
+        audio_source = None
+        if hasattr(st, "audio_input"):
+            audio_source = st.audio_input("회의 음성 녹음", key="meeting_audio_input")
+        else:
+            audio_source = st.file_uploader("음성 파일 업로드 (wav / mp3 / m4a)", type=["wav", "mp3", "m4a", "webm"], key="meeting_audio_upload")
+
+        stt_col1, stt_col2 = st.columns([1, 2])
+        with stt_col1:
+            if st.button("음성을 텍스트로 변환", key="btn_stt", use_container_width=True):
+                if not audio_source:
+                    st.warning("먼저 음성을 녹음하거나 파일을 업로드해주세요.")
+                else:
+                    with st.spinner("음성을 회의록으로 변환 중…"):
+                        transcript = transcribe_audio_file(audio_source)
+                    if transcript.strip():
+                        st.session_state["meeting_text"] = transcript
+                        clear_results()
+                        st.success("STT 변환 완료! 입력창에 반영했습니다.")
+                        st.rerun()
+                    else:
+                        st.warning("변환된 텍스트가 없습니다. 음성 파일을 다시 확인해주세요.")
+        with stt_col2:
+            st.caption("회의 분석 대시보드의 입력 영역에 넣는 것이 가장 효율적이라 이 위치에 배치했습니다.")
+
     col_ex, col_clear = st.columns([1, 1])
     with col_ex:
         if st.button("예시 회의록 불러오기", use_container_width=True):
@@ -86,29 +114,26 @@ with st.container():
     st.markdown(f'<div style="font-size:0.72rem;color:#35334D;margin-top:4px;">{len(meeting_text):,}자</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ── Keyword row ──
-kw_col, kw_btn_col = st.columns([5, 1])
-with kw_btn_col:
-    if st.button("🏷️ 키워드 추출", use_container_width=True):
-        with st.spinner("키워드 추출 중..."):
-            st.session_state["keywords_result"] = extract_keywords(meeting_text)
-
-if st.session_state.get("keywords_result"):
-    tags_html = "".join([f'<span class="kw-tag"># {kw}</span>' for kw in st.session_state["keywords_result"]])
-    st.markdown(f'<div class="kw-wrap">{tags_html}</div>', unsafe_allow_html=True)
-
-# ── Run all / Reset ──
-run_col, length_col, reset_col = st.columns([3, 2, 1])
-with length_col:
-    length_opt = st.selectbox("요약 길이", ["보통", "짧게", "자세히"], label_visibility="collapsed")
+# ── Top action row: key actions aligned in one line ──
+run_col, length_col, kw_btn_col, reset_col = st.columns([3.2, 2.1, 1.25, 1.25])
 with run_col:
     st.markdown('<div class="btn-primary">', unsafe_allow_html=True)
     run_all = st.button("⚡ 전체 분석 실행", use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
+with length_col:
+    length_opt = st.selectbox("요약 길이", ["보통", "짧게", "자세히"], label_visibility="collapsed")
+with kw_btn_col:
+    if st.button("🏷️ 키워드 추출", use_container_width=True):
+        with st.spinner("키워드 추출 중..."):
+            st.session_state["keywords_result"] = extract_keywords(meeting_text)
 with reset_col:
     if st.button("↺ 초기화", use_container_width=True):
         clear_results()
         st.rerun()
+
+if st.session_state.get("keywords_result"):
+    tags_html = "".join([f'<span class="kw-tag"># {kw}</span>' for kw in st.session_state["keywords_result"]])
+    st.markdown(f'<div class="kw-wrap">{tags_html}</div>', unsafe_allow_html=True)
 
 if run_all:
     with st.spinner("에이블이 분석 중입니다…"):
@@ -124,7 +149,8 @@ if run_all:
     st.success(f"분석 완료! 업무 {len(extracted) if extracted else 0}개가 업무 대시보드에도 반영됐어요.")
 
 # ── Snapshot / Compare ──
-snap_col, cmp_col = st.columns(2)
+history = st.session_state.get("history", [])
+snap_col, cmp_sel_col, cmp_btn_col = st.columns([3.2, 2.1, 2.5])
 with snap_col:
     if st.button("💾 스냅샷 저장", use_container_width=True):
         if "history" not in st.session_state:
@@ -136,17 +162,20 @@ with snap_col:
         })
         st.success(f"스냅샷 #{len(st.session_state['history'])} 저장 완료!")
 
-history = st.session_state.get("history", [])
-with cmp_col:
-    if len(history) >= 1:
+if len(history) >= 1:
+    with cmp_sel_col:
         snap_opts = [f"#{i+1} · {s['saved_at']}" for i, s in enumerate(history)]
         sel = st.selectbox("비교할 스냅샷", snap_opts, label_visibility="collapsed")
+    with cmp_btn_col:
         if st.button("🔍 이전 회의 대비 변화 분석", use_container_width=True):
             idx = snap_opts.index(sel)
             with st.spinner("변화 분석 중..."):
                 st.session_state["compare_result"] = compare_meetings(history[idx]["text"], meeting_text)
-    else:
-        st.caption("스냅샷을 먼저 저장하면 회의 간 비교가 가능해요.")
+else:
+    with cmp_sel_col:
+        st.caption("스냅샷을 먼저 저장하면")
+    with cmp_btn_col:
+        st.caption("회의 간 비교가 가능해요.")
 
 if st.session_state.get("compare_result"):
     with st.expander("📊 이전 회의 대비 변화 분석", expanded=True):
@@ -191,6 +220,7 @@ if t:
                     st.session_state["summary_result"] = summarize_meeting(meeting_text, sum_len)
         if st.session_state.get("summary_result"):
             st.markdown(st.session_state["summary_result"])
+            render_tts_control(st.session_state["summary_result"], "tts_summary")
         else:
             st.info("⚡ 전체 분석 실행 또는 요약 생성 버튼을 눌러주세요.")
 
@@ -206,6 +236,7 @@ if t:
         if st.session_state.get("tasks_result"):
             if view_mode == "📊 표 보기":
                 st.markdown(st.session_state["tasks_result"])
+                render_tts_control(st.session_state["tasks_result"], "tts_tasks")
             else:
                 # parse to checklist
                 rows = []
@@ -222,6 +253,7 @@ if t:
                             "우선순위": cells[4] if len(cells) > 4 else "-"})
                 if not rows:
                     st.markdown(st.session_state["tasks_result"])
+                    render_tts_control(st.session_state["tasks_result"], "tts_tasks")
                 else:
                     if "todo_checks" not in st.session_state:
                         st.session_state["todo_checks"] = {i: False for i in range(len(rows))}
@@ -254,6 +286,7 @@ if t:
                 st.session_state["branding_result"] = branding_insight(meeting_text)
         if st.session_state.get("branding_result"):
             st.markdown(st.session_state["branding_result"])
+            render_tts_control(st.session_state["branding_result"], "tts_branding")
         else:
             st.info("인사이트 생성 버튼을 눌러주세요.")
 
@@ -266,6 +299,7 @@ if t:
                 st.session_state["action_risk_result"] = action_and_risk(meeting_text)
         if st.session_state.get("action_risk_result"):
             st.markdown(st.session_state["action_risk_result"])
+            render_tts_control(st.session_state["action_risk_result"], "tts_action")
         else:
             st.info("생성 버튼을 눌러주세요.")
 
@@ -278,6 +312,7 @@ if t:
                 st.session_state["decisions_result"] = decisions(meeting_text)
         if st.session_state.get("decisions_result"):
             st.markdown(st.session_state["decisions_result"])
+            render_tts_control(st.session_state["decisions_result"], "tts_decisions")
         else:
             st.info("추출 버튼을 눌러주세요.")
 
@@ -293,6 +328,7 @@ if t:
                 st.session_state["qa_result"] = ask_able(question, ref)
         if st.session_state.get("qa_result"):
             st.markdown(st.session_state["qa_result"])
+            render_tts_control(st.session_state["qa_result"], "tts_qa")
         else:
             st.info("질문을 입력하고 버튼을 눌러주세요.")
 
@@ -306,6 +342,7 @@ if t:
             r_email = st.text_input("수신자 이메일", value="")
         with e2:
             s_name  = st.text_input("발신자명", value="에이블")
+            st.caption(f"발신 이메일은 SendGrid 인증 주소({EMAIL_ADDRESS})로 고정됩니다.")
             subject = st.text_input("이메일 제목", value="[에이블 브리핑] 회의 정리")
         if st.button("이메일 초안 생성", key="btn_email"):
             with st.spinner("초안 생성 중..."):
@@ -327,7 +364,7 @@ if t:
                             headers = {"Authorization": f"Bearer {SENDGRID_API_KEY}", "Content-Type": "application/json"}
                             payload = {
                                 "personalizations": [{"to": [{"email": r_email}], "subject": subject}],
-                                "from": {"email": EMAIL_ADDRESS},
+                                "from": {"email": EMAIL_ADDRESS, "name": s_name},
                                 "content": [{"type": "text/plain", "value": body}],
                             }
                             resp = requests.post("https://api.sendgrid.com/v3/mail/send",
@@ -361,6 +398,7 @@ if t:
                 )
             st.download_button("⬇ 알림 TXT 다운로드", data=raw,
                 file_name="able_notify.txt", mime="text/plain", use_container_width=True)
+            render_tts_control(raw, "tts_notify")
         else:
             st.info("알림 메시지 생성 버튼을 눌러주세요.")
 
@@ -401,6 +439,7 @@ if t:
                 ])
                 st.download_button("⬇ 뉴스 TXT 다운로드", data=news_text,
                     file_name="able_news.txt", mime="text/plain", use_container_width=True)
+                render_tts_control(news_text, "tts_news")
         else:
             st.info("뉴스 가져오기 버튼을 눌러주세요.")
 
