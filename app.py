@@ -2,6 +2,9 @@
 import os
 import streamlit as st
 
+BASE_DIR = os.path.dirname(__file__)
+ABLE_IMAGE_PATH = os.path.join(BASE_DIR, "assets", "able_bunny.png")
+
 st.set_page_config(
     page_title="에이블 | Z세대 리브랜딩 AI 비서",
     page_icon="✨",
@@ -35,29 +38,48 @@ html, body, [class*="css"] {
 }
 [data-testid="stAppViewContainer"] { background: #F7F4FF !important; }
 .block-container {
-    padding-top: 0 !important;
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
     max-width: 100% !important;
 }
 
 /* ── LOGIN LAYOUT ── */
 .login-root {
-    display: flex;
-    min-height: 100vh;
+    min-height: auto;
+    padding: 0.15rem 1rem 0.1rem;
+}
+.login-shell {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(320px, 0.95fr) minmax(380px, 1.05fr);
+    gap: 1.35rem;
     align-items: center;
-    justify-content: center;
-    padding: 1.2rem 1rem;
+}
+.login-hero {
+    background: rgba(255,255,255,0.58);
+    border: 1px solid #DDD3F2;
+    border-radius: 24px;
+    padding: 0.55rem;
+    box-shadow: 0 18px 50px rgba(130,104,190,0.08);
+}
+.login-hero [data-testid="stImage"] img {
+    border-radius: 20px;
+    max-height: 520px;
+    object-fit: contain;
 }
 .login-card {
     width: 100%;
-    max-width: 480px;
+    max-width: 560px;
 }
 .login-logo {
     text-align: center;
-    margin-bottom: 1.4rem;
+    margin-bottom: 0.65rem;
 }
 .login-wordmark {
     font-family: 'Syne', sans-serif;
-    font-size: 2.8rem;
+    font-size: 2.35rem;
     font-weight: 800;
     background: linear-gradient(120deg, #C4A8FF 0%, #E94C98 100%);
     -webkit-background-clip: text;
@@ -68,7 +90,7 @@ html, body, [class*="css"] {
 .login-sub {
     font-size: 0.82rem;
     color: #766D8A;
-    margin-top: 0.5rem;
+    margin-top: 0.3rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
@@ -78,7 +100,7 @@ html, body, [class*="css"] {
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #6F6682;
-    margin-bottom: 0.9rem;
+    margin-bottom: 0.45rem;
 }
 
 /* ── ROLE CARDS ── */
@@ -119,11 +141,11 @@ html, body, [class*="css"] {
     font-family: 'Pretendard', sans-serif !important;
     font-size: 0.92rem !important;
     font-weight: 600 !important;
-    padding: 0.8rem 1.1rem !important;
+    padding: 0.62rem 1rem !important;
     width: 100% !important;
     text-align: left !important;
     transition: all 0.18s !important;
-    margin-bottom: 0.4rem !important;
+    margin-bottom: 0.28rem !important;
 }
 .stButton > button:hover {
     background: #F2ECFF !important;
@@ -138,10 +160,21 @@ html, body, [class*="css"] {
 /* ── FOOTER ── */
 .login-footer {
     text-align: center;
-    margin-top: 1.5rem;
+    margin-top: 0.75rem;
     font-size: 0.72rem;
     color: #9B92AD;
     letter-spacing: 0.05em;
+}
+@media (max-width: 920px) {
+    .login-shell { grid-template-columns: 1fr; gap: 0.75rem; }
+    .login-hero { display: none; }
+    .login-card { max-width: 560px; margin: 0 auto; }
+}
+@media (max-height: 760px) {
+    .login-hero [data-testid="stImage"] img { max-height: 455px; }
+    .login-wordmark { font-size: 2.15rem; }
+    .stButton > button { padding: 0.54rem 0.9rem !important; margin-bottom: 0.22rem !important; }
+    .login-footer { margin-top: 0.5rem; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -185,30 +218,43 @@ if st.session_state.get("logged_in_user"):
 # ══════════════════════════════════════════════════════════════
 # LOGIN UI
 # ══════════════════════════════════════════════════════════════
-st.markdown('<div class="login-root"><div class="login-card">', unsafe_allow_html=True)
+st.markdown('<div class="login-root"><div class="login-shell">', unsafe_allow_html=True)
 
-st.markdown("""
-<div class="login-logo">
-    <div class="login-wordmark">에이블</div>
-    <div class="login-sub">Z세대 리브랜딩 전략 AI 비서</div>
-</div>
-<div class="login-label">담당자를 선택해 시작하세요</div>
-""", unsafe_allow_html=True)
+hero_col, login_col = st.columns([0.95, 1.05], gap="large")
+with hero_col:
+    st.markdown('<div class="login-hero">', unsafe_allow_html=True)
+    if os.path.exists(ABLE_IMAGE_PATH):
+        st.image(ABLE_IMAGE_PATH, use_container_width=True)
+    else:
+        st.markdown('<div style="padding:3rem;text-align:center;color:#766D8A;">에이블 이미지</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-for name, meta in ROLES.items():
-    if st.button(
-        f"{meta['emoji']}  {name}  ·  {meta['title']} — {meta['desc']}",
-        key=f"login_{name}",
-        use_container_width=True,
-    ):
-        st.session_state["logged_in_user"] = name
-        st.session_state["role_meta"] = meta
-        st.session_state["ROLES"] = ROLES
-        if "tasks" not in st.session_state:
-            st.session_state["tasks"] = []
-        st.switch_page("pages/1_dashboard.py")
+with login_col:
+    st.markdown('<div class="login-card">', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="login-logo">
+        <div class="login-wordmark">에이블</div>
+        <div class="login-sub">Z세대 리브랜딩 전략 AI 비서</div>
+    </div>
+    <div class="login-label">담당자를 선택해 시작하세요</div>
+    """, unsafe_allow_html=True)
 
-st.markdown("""
-<div class="login-footer">ABLE v6 · Anthropic Claude Powered</div>
-</div></div>
-""", unsafe_allow_html=True)
+    for name, meta in ROLES.items():
+        if st.button(
+            f"{meta['emoji']}  {name}  ·  {meta['title']} — {meta['desc']}",
+            key=f"login_{name}",
+            use_container_width=True,
+        ):
+            st.session_state["logged_in_user"] = name
+            st.session_state["role_meta"] = meta
+            st.session_state["ROLES"] = ROLES
+            if "tasks" not in st.session_state:
+                st.session_state["tasks"] = []
+            st.switch_page("pages/1_dashboard.py")
+
+    st.markdown("""
+    <div class="login-footer">ABLE v6 · Anthropic Claude Powered</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown('</div></div>', unsafe_allow_html=True)

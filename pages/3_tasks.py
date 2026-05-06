@@ -8,7 +8,7 @@ import pandas as pd
 import streamlit as st
 from shared import (
     GLOBAL_CSS, ROLES,
-    render_sidebar, extract_tasks_structured, add_tasks_to_state,
+    render_sidebar, extract_tasks_structured, add_tasks_to_state, render_tts_control,
 )
 
 st.set_page_config(
@@ -153,12 +153,11 @@ tasks = st.session_state["tasks"]
 # ══════════════════════════════════════════════════════════════
 if not tasks:
     st.markdown("""
-    <div style="text-align:center;padding:4rem 2rem;background:#FFFFFF;border:1px dashed #E5DDF7;border-radius:14px;margin-top:1rem;">
-        <div style="font-size:2.5rem;margin-bottom:0.7rem;">📭</div>
-        <div style="color:#6F6682;font-size:0.9rem;font-weight:600;">등록된 업무가 없습니다.<br>위에서 회의록을 업로드하거나 업무를 추출해주세요.</div>
+    <div style="text-align:center;padding:1.8rem 2rem;background:#FFFFFF;border:1px dashed #E5DDF7;border-radius:14px;margin:1rem 0;">
+        <div style="font-size:2.1rem;margin-bottom:0.5rem;">📭</div>
+        <div style="color:#6F6682;font-size:0.9rem;font-weight:600;">등록된 업무가 없습니다.<br>아래 탭은 바로 확인 가능하며, 위에서 회의록을 업로드하거나 업무를 추출하면 업무 흐름에 자동 반영됩니다.</div>
     </div>
     """, unsafe_allow_html=True)
-    st.stop()
 
 # ══════════════════════════════════════════════════════════════
 # SUMMARY METRICS
@@ -191,9 +190,17 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+status_summary_text = (
+    f"업무 현황입니다. 전체 업무는 {total}개이고, 진행 예정 {todo}개, 진행 중 {doing}개, "
+    f"검토 중 {review}개, 완료 {done}개입니다. 완료율은 {pct_done}퍼센트입니다. "
+    f"높은 우선순위 업무는 {high_p}개입니다."
+)
+render_tts_control(status_summary_text, "tts_task_status", label="🔊 업무 현황 음성으로 듣기")
+
 # ══════════════════════════════════════════════════════════════
 # THREE VIEWS: 편집 테이블 | 카드 보기 | 업무 흐름
 # ══════════════════════════════════════════════════════════════
+st.markdown('<div style="font-size:0.78rem;color:#6F6682;margin-bottom:0.4rem;">업무 표·카드·흐름을 같은 데이터로 확인합니다.</div>', unsafe_allow_html=True)
 view_tab1, view_tab2, view_tab3 = st.tabs(["📊 편집 테이블", "🗂️ 카드 보기", "🔄 업무 흐름"])
 
 # ── 편집 테이블 ──
@@ -332,4 +339,10 @@ with view_tab3:
 
     for rec in recommendations:
         st.markdown(f'<div class="next-action">💡 {rec}</div>', unsafe_allow_html=True)
+
+    workflow_tts = (
+        f"업무 흐름 요약입니다. 진행 예정 {todo}개, 진행 중 {doing}개, 검토 중 {review}개, 완료 {done}개입니다. "
+        + " ".join([r.replace("<strong>", "").replace("</strong>", "") for r in recommendations])
+    )
+    render_tts_control(workflow_tts, "tts_task_workflow", label="🔊 업무 흐름 음성으로 듣기")
 

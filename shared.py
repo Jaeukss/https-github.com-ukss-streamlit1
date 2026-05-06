@@ -9,6 +9,9 @@ from pathlib import Path
 import streamlit as st
 from openai import OpenAI
 
+BASE_DIR = os.path.dirname(__file__)
+ABLE_IMAGE_PATH = os.path.join(BASE_DIR, "assets", "able_bunny.png")
+
 # ══════════════════════════════════════════════════════════════
 # ROLES  (mirrored here so pages can import without app.py)
 # ══════════════════════════════════════════════════════════════
@@ -327,15 +330,19 @@ footer { visibility: hidden; }
 header { visibility: hidden; height: 0 !important; }
 [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], .stDeployButton { display: none !important; }
 [data-testid="stHeader"] { height: 0 !important; background: transparent !important; }
+[data-testid="collapsedControl"] { display: flex !important; visibility: visible !important; opacity: 1 !important; }
 .stApp { background: #F7F4FF !important; }
 [data-testid="stAppViewContainer"] { background: #F7F4FF !important; }
 
 /* ── NAV SIDEBAR ── */
 [data-testid="stSidebarNav"] { display: none !important; }
 section[data-testid="stSidebar"] {
+    display: block !important;
+    visibility: visible !important;
     background: #FFFFFF !important;
     border-right: 1px solid #E5DDF7 !important;
     min-width: 220px !important;
+    width: 250px !important;
 }
 section[data-testid="stSidebar"] * { color: #2E2940 !important; }
 
@@ -525,6 +532,11 @@ def render_sidebar(current_page: str = ""):
     color = meta.get("color", "#7C5CFF")
 
     with st.sidebar:
+        if os.path.exists(ABLE_IMAGE_PATH):
+            st.markdown('<div class="sb-mascot">', unsafe_allow_html=True)
+            st.image(ABLE_IMAGE_PATH, width=86)
+            st.markdown('</div>', unsafe_allow_html=True)
+
         st.markdown(f"""
         <div class="sb-profile" style="border-color:{color}22;">
             <div class="sb-emoji">{meta.get('emoji','✨')}</div>

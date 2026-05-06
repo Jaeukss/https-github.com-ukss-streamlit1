@@ -342,7 +342,6 @@ if t:
             r_email = st.text_input("수신자 이메일", value="")
         with e2:
             s_name  = st.text_input("발신자명", value="에이블")
-            st.caption(f"발신 이메일은 SendGrid 인증 주소({EMAIL_ADDRESS})로 고정됩니다.")
             subject = st.text_input("이메일 제목", value="[에이블 브리핑] 회의 정리")
         if st.button("이메일 초안 생성", key="btn_email"):
             with st.spinner("초안 생성 중..."):
@@ -364,7 +363,7 @@ if t:
                             headers = {"Authorization": f"Bearer {SENDGRID_API_KEY}", "Content-Type": "application/json"}
                             payload = {
                                 "personalizations": [{"to": [{"email": r_email}], "subject": subject}],
-                                "from": {"email": EMAIL_ADDRESS, "name": s_name},
+                                "from": {"email": EMAIL_ADDRESS},
                                 "content": [{"type": "text/plain", "value": body}],
                             }
                             resp = requests.post("https://api.sendgrid.com/v3/mail/send",
