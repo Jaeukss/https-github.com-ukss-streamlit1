@@ -299,6 +299,13 @@ def render_step_guide(current_page: str = ""):
             "🔄 업무 흐름 탭에서 병목 확인",
             "다음 액션 추천 확인",
         ]
+    elif current_page == "4_chatbot.py":
+        steps = [
+            "파일 업로드 또는 질문 입력",
+            "필요하면 🎙️ 음성으로 질문",
+            "실행 버튼으로 에이블 답변 확인",
+            "필요하면 답변을 🔊 음성으로 듣기",
+        ]
     else:
         steps = [
             "담당자를 선택해 로그인",
@@ -766,6 +773,7 @@ def render_sidebar(current_page: str = ""):
             ("1_dashboard.py",  "📋", "회의 분석 대시보드"),
             ("2_shortform.py",  "🎬", "숏폼 스튜디오"),
             ("3_tasks.py",      "✅", "업무 대시보드"),
+            ("4_chatbot.py",    "🤖", "에이블 챗봇"),
         ]
         for page_file, icon, label in pages:
             is_active = current_page == page_file
@@ -781,7 +789,6 @@ def render_sidebar(current_page: str = ""):
                     st.switch_page(f"pages/{page_file}")
 
         render_step_guide(current_page)
-        render_sidebar_chatbot(current_page)
 
         st.markdown('<div class="sb-section">히스토리</div>', unsafe_allow_html=True)
         history = st.session_state.get("history", [])

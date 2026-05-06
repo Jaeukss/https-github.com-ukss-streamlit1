@@ -144,6 +144,70 @@ html, body, [class*="css"] {
     color: #9B92AD;
     letter-spacing: 0.05em;
 }
+
+/* ── LOGIN IMAGE SPLIT LAYOUT ── */
+.login-root {
+    min-height: 100vh;
+    align-items: center;
+    padding: 1.2rem 2rem !important;
+}
+.login-shell {
+    width: min(1180px, 96vw);
+    display: grid;
+    grid-template-columns: minmax(360px, 1.05fr) minmax(360px, 0.95fr);
+    gap: 2rem;
+    align-items: center;
+}
+.login-hero {
+    background: rgba(255,255,255,0.62);
+    border: 1px solid #DDD3F2;
+    border-radius: 28px;
+    padding: 1rem;
+    box-shadow: 0 18px 45px rgba(124,92,255,0.08);
+}
+.login-hero img {
+    width: 100%;
+    max-height: 78vh;
+    object-fit: contain;
+    display: block;
+    border-radius: 22px;
+}
+.login-card {
+    max-width: 560px !important;
+    justify-self: center;
+}
+.login-logo {
+    text-align: left !important;
+    margin-bottom: 1.2rem !important;
+}
+.login-wordmark {
+    font-size: clamp(3rem, 5vw, 5rem) !important;
+}
+.login-sub {
+    font-size: 0.95rem !important;
+}
+.login-label {
+    margin-bottom: 0.75rem !important;
+}
+.stButton > button {
+    padding: 0.92rem 1.15rem !important;
+    font-size: 0.98rem !important;
+    margin-bottom: 0.55rem !important;
+    text-align: center !important;
+    background: rgba(255,255,255,0.52) !important;
+}
+.login-footer {
+    text-align: left !important;
+    margin-top: 1rem !important;
+}
+@media (max-width: 900px) {
+    .login-root { padding: 0.8rem 1rem !important; align-items: flex-start; }
+    .login-shell { grid-template-columns: 1fr; gap: 0.9rem; }
+    .login-hero img { max-height: 34vh; }
+    .login-logo { text-align: center !important; margin-bottom: 0.7rem !important; }
+    .login-footer { text-align: center !important; }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -186,14 +250,43 @@ if st.session_state.get("logged_in_user"):
 # ══════════════════════════════════════════════════════════════
 # LOGIN UI
 # ══════════════════════════════════════════════════════════════
-st.markdown('<div class="login-root"><div class="login-card">', unsafe_allow_html=True)
+image_path = os.path.join(os.path.dirname(__file__), "assets", "able_bunny.png")
 
+st.markdown('<div class="login-root"><div class="login-shell">', unsafe_allow_html=True)
+
+with st.container():
+    if os.path.exists(image_path):
+        st.markdown('<div class="login-hero">', unsafe_allow_html=True)
+        st.image(image_path, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="login-hero"><div style="padding:4rem;text-align:center;color:#9B92AD;">에이블 이미지</div></div>', unsafe_allow_html=True)
+
+st.markdown('<div class="login-card">', unsafe_allow_html=True)
 st.markdown("""
 <div class="login-logo">
     <div class="login-wordmark">에이블</div>
     <div class="login-sub">Z세대 리브랜딩 전략 AI 비서</div>
 </div>
 <div class="login-label">담당자를 선택해 시작하세요</div>
+""", unsafe_allow_html=True)
+
+for name, meta in ROLES.items():
+    if st.button(
+        f"{meta['emoji']}  {name}  ·  {meta['title']} — {meta['desc']}",
+        key=f"login_{name}",
+        use_container_width=True,
+    ):
+        st.session_state["logged_in_user"] = name
+        st.session_state["role_meta"] = meta
+        st.session_state["ROLES"] = ROLES
+        if "tasks" not in st.session_state:
+            st.session_state["tasks"] = []
+        st.switch_page("pages/1_dashboard.py")
+
+st.markdown("""
+<div class="login-footer">ABLE v6 · Anthropic Claude Powered</div>
+</div></div></div>
 """, unsafe_allow_html=True)
 
 for name, meta in ROLES.items():
