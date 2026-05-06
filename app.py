@@ -23,8 +23,8 @@ st.markdown("""
 html, body, [class*="css"] { font-family: 'DM Sans', sans-serif !important; }
 
 .stApp {
-    background: linear-gradient(160deg, #080b12 0%, #0d1120 55%, #070a10 100%);
-    color: #c9d4e8;
+    background: #F5F7FB;
+    color: #1a2340;
 }
 .main .block-container { padding-top: 2rem; max-width: 980px; }
 
@@ -34,7 +34,7 @@ h1 {
     font-size: 2.5rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.025em !important;
-    background: linear-gradient(90deg, #4F8EF7 0%, #9B59F7 60%, #F4845F 100%);
+    background: linear-gradient(90deg, #2563EB 0%, #7C3AED 60%, #F4845F 100%);
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     margin-bottom: 0.1rem !important;
@@ -42,57 +42,58 @@ h1 {
 h2, h3 {
     font-family: 'Syne', sans-serif !important;
     font-weight: 700 !important;
-    color: #b8c8e4 !important;
+    color: #1e2d50 !important;
 }
 
 /* Sidebar */
 section[data-testid="stSidebar"] {
-    background: #080b12 !important;
-    border-right: 1px solid #151d2e !important;
+    background: #ffffff !important;
+    border-right: 1px solid #e2e8f4 !important;
 }
 
 /* Buttons */
 .stButton > button {
-    background: linear-gradient(135deg, #151d2e 0%, #1c2540 100%) !important;
-    color: #96aad0 !important;
-    border: 1px solid #232e48 !important;
+    background: #ffffff !important;
+    color: #2d4070 !important;
+    border: 1px solid #d0d8ee !important;
     border-radius: 10px !important;
     font-family: 'DM Sans', sans-serif !important;
     font-weight: 500 !important;
-    transition: all 0.22s ease !important;
+    transition: all 0.2s ease !important;
     padding: 0.55rem 1.2rem !important;
 }
 .stButton > button:hover {
-    border-color: #4F8EF7 !important;
-    color: #e8f0ff !important;
-    box-shadow: 0 4px 24px rgba(79,142,247,0.22) !important;
+    background: #EEF3FF !important;
+    border-color: #2563EB !important;
+    color: #1a3a9e !important;
+    box-shadow: 0 2px 12px rgba(37,99,235,0.12) !important;
     transform: translateY(-1px) !important;
 }
 
 /* Inputs */
 textarea, input[type="text"] {
-    background: #0d1220 !important;
-    color: #c2d0ea !important;
-    border: 1px solid #1e2a42 !important;
+    background: #ffffff !important;
+    color: #1a2340 !important;
+    border: 1px solid #d0d8ee !important;
     border-radius: 10px !important;
     font-family: 'DM Sans', sans-serif !important;
 }
 textarea:focus, input[type="text"]:focus {
-    border-color: #4F8EF7 !important;
-    box-shadow: 0 0 0 2px rgba(79,142,247,0.18) !important;
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
 }
 
 /* Tabs */
 .stTabs [data-baseweb="tab-list"] {
-    background: #0a0e18 !important;
+    background: #edf0f8 !important;
     border-radius: 12px !important;
     gap: 3px !important;
     padding: 4px !important;
-    border: 1px solid #151d2e !important;
+    border: 1px solid #dce3f0 !important;
 }
 .stTabs [data-baseweb="tab"] {
     background: transparent !important;
-    color: #4a5c7c !important;
+    color: #7a8fbb !important;
     border-radius: 8px !important;
     font-family: 'DM Sans', sans-serif !important;
     font-size: 0.8rem !important;
@@ -100,16 +101,17 @@ textarea:focus, input[type="text"]:focus {
     transition: all 0.18s !important;
 }
 .stTabs [aria-selected="true"] {
-    background: linear-gradient(135deg, #192040, #1c2848) !important;
-    color: #6aA4FF !important;
-    border-bottom: 2px solid #4F8EF7 !important;
+    background: #ffffff !important;
+    color: #2563EB !important;
+    border-bottom: 2px solid #2563EB !important;
+    box-shadow: 0 1px 4px rgba(37,99,235,0.1) !important;
 }
 
 /* Divider */
-hr { border-color: #141c2e !important; }
+hr { border-color: #e2e8f4 !important; }
 
 /* Expander */
-details summary { color: #6070a0 !important; font-size: 0.88rem !important; }
+details summary { color: #7a8fbb !important; font-size: 0.88rem !important; }
 
 /* ── Login UI ──────────────────────────── */
 .login-wrapper {
