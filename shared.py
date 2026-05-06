@@ -33,7 +33,7 @@ ROLES = {
         "title": "대리", "emoji": "🐰",
         "color": "#17A976", "bg": "#E9FFF6",
         "desc": "브랜드 리서치 · 숏폼 콘텐츠",
-        "access": "shortform",
+        "access": "full",
     },
 }
 
@@ -251,6 +251,11 @@ GLOBAL_CSS = """
 html, body, [class*="css"] {
     font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
 }
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
+header { visibility: hidden; height: 0 !important; }
+[data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], .stDeployButton { display: none !important; }
+[data-testid="stHeader"] { height: 0 !important; background: transparent !important; }
 .stApp { background: #F7F4FF !important; }
 [data-testid="stAppViewContainer"] { background: #F7F4FF !important; }
 
@@ -288,16 +293,16 @@ section[data-testid="stSidebar"] * { color: #2E2940 !important; }
 .nav-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
 /* ── PAGE COMMON ── */
-.block-container { padding: 2rem 2.5rem 3rem !important; max-width: 1100px !important; }
+.block-container { padding: 0.65rem 2.5rem 2.5rem !important; max-width: 1100px !important; }
 
 .page-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1.2rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.85rem;
     border-bottom: 1px solid #E6DDF7;
 }
 .page-title {
     font-family: 'Syne', sans-serif;
-    font-size: 1.8rem; font-weight: 800;
+    font-size: 1.65rem; font-weight: 800;
     color: #211A32;
     letter-spacing: -0.02em;
     margin: 0 0 0.25rem;

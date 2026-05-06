@@ -22,7 +22,9 @@ st.markdown("""
 section[data-testid="stSidebar"] { display: none !important; }
 #MainMenu { visibility: hidden; }
 footer { visibility: hidden; }
-header { visibility: hidden; }
+header { visibility: hidden; height: 0 !important; }
+[data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], .stDeployButton { display: none !important; }
+[data-testid="stHeader"] { height: 0 !important; background: transparent !important; }
 
 html, body, [class*="css"] {
     font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
@@ -40,10 +42,10 @@ html, body, [class*="css"] {
 /* ── LOGIN LAYOUT ── */
 .login-root {
     display: flex;
-    min-height: 100vh;
+    min-height: calc(100vh - 12px);
     align-items: center;
     justify-content: center;
-    padding: 3rem 1rem;
+    padding: 0.6rem 1rem 0.9rem;
 }
 .login-card {
     width: 100%;
@@ -51,11 +53,11 @@ html, body, [class*="css"] {
 }
 .login-logo {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.35rem;
 }
 .login-wordmark {
     font-family: 'Syne', sans-serif;
-    font-size: 3.2rem;
+    font-size: 2.75rem;
     font-weight: 800;
     background: linear-gradient(120deg, #C4A8FF 0%, #E94C98 100%);
     -webkit-background-clip: text;
@@ -76,7 +78,7 @@ html, body, [class*="css"] {
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #6F6682;
-    margin-bottom: 0.9rem;
+    margin-bottom: 0.55rem;
 }
 
 /* ── ROLE CARDS ── */
@@ -117,11 +119,11 @@ html, body, [class*="css"] {
     font-family: 'Pretendard', sans-serif !important;
     font-size: 0.92rem !important;
     font-weight: 600 !important;
-    padding: 1rem 1.3rem !important;
+    padding: 0.78rem 1.1rem !important;
     width: 100% !important;
     text-align: left !important;
     transition: all 0.18s !important;
-    margin-bottom: 0.4rem !important;
+    margin-bottom: 0.32rem !important;
 }
 .stButton > button:hover {
     background: #F2ECFF !important;
@@ -136,7 +138,7 @@ html, body, [class*="css"] {
 /* ── FOOTER ── */
 .login-footer {
     text-align: center;
-    margin-top: 3rem;
+    margin-top: 1.25rem;
     font-size: 0.72rem;
     color: #9B92AD;
     letter-spacing: 0.05em;
@@ -170,7 +172,7 @@ ROLES = {
         "title": "대리", "emoji": "🐰",
         "color": "#17A976", "bg": "#E9FFF6",
         "desc": "브랜드 리서치 · 숏폼 콘텐츠",
-        "access": "shortform",
+        "access": "full",
     },
 }
 

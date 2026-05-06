@@ -28,21 +28,21 @@ st.markdown("""
 <style>
 .metric-row { display: flex; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; }
 .metric-box {
-    background: #13121E; border: 1px solid #1E1C2E; border-radius: 12px;
+    background: #FFFFFF; border: 1px solid #E5DDF7; border-radius: 12px;
     padding: 0.9rem 1.2rem; min-width: 110px; flex: 1;
     text-align: center;
 }
-.metric-val { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: #E8E5F5; }
-.metric-lbl { font-size: 0.72rem; color: #4E4B63; margin-top: 2px; font-weight: 600; letter-spacing: 0.06em; }
+.metric-val { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: #211A32; }
+.metric-lbl { font-size: 0.72rem; color: #6F6682; margin-top: 2px; font-weight: 600; letter-spacing: 0.06em; }
 
 .task-card {
-    background: #13121E; border: 1px solid #1E1C2E; border-radius: 14px;
+    background: #FFFFFF; border: 1px solid #E5DDF7; border-radius: 14px;
     padding: 1.1rem 1.3rem; margin-bottom: 0.6rem; height: 100%;
 }
 .tc-priority { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.4rem; }
-.tc-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: #E8E5F5; margin-bottom: 0.4rem; }
-.tc-desc { font-size: 0.78rem; color: #6B6680; line-height: 1.55; margin-bottom: 0.7rem; }
-.tc-meta { font-size: 0.72rem; color: #4E4B63; }
+.tc-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: #211A32; margin-bottom: 0.4rem; }
+.tc-desc { font-size: 0.78rem; color: #766D8A; line-height: 1.55; margin-bottom: 0.7rem; }
+.tc-meta { font-size: 0.72rem; color: #6F6682; }
 .badge {
     display: inline-block; border-radius: 20px; padding: 2px 10px;
     font-size: 0.68rem; font-weight: 700;
@@ -63,18 +63,18 @@ STATUS_FLOW = {"진행 예정": "진행 중", "진행 중": "검토 중", "검�
 
 def priority_style(p):
     return {
-        "높음":  ("color:#FF6B6B;", "🔴"),
-        "보통":  ("color:#FFD93D;", "🟡"),
-        "낮음":  ("color:#6BCB77;", "🟢"),
-    }.get(p, ("color:#4E4B63;", "⚪"))
+        "높음":  ("color:#D9364B;", "🔴"),
+        "보통":  ("color:#B68A00;", "🟡"),
+        "낮음":  ("color:#219653;", "🟢"),
+    }.get(p, ("color:#6F6682;", "⚪"))
 
 def status_color(s):
     return {
-        "진행 예정": "#4E4B63",
-        "진행 중":   "#BFA8FF",
-        "검토 중":   "#60C8F5",
-        "완료":      "#5ADBA9",
-    }.get(s, "#4E4B63")
+        "진행 예정": "#6F6682",
+        "진행 중":   "#7C5CFF",
+        "검토 중":   "#2496D8",
+        "완료":      "#17A976",
+    }.get(s, "#6F6682")
 
 def move_status(task_id):
     for t in st.session_state["tasks"]:
@@ -135,9 +135,9 @@ tasks = st.session_state["tasks"]
 # ══════════════════════════════════════════════════════════════
 if not tasks:
     st.markdown("""
-    <div style="text-align:center;padding:4rem 2rem;background:#13121E;border:1px dashed #1E1C2E;border-radius:14px;margin-top:1rem;">
+    <div style="text-align:center;padding:4rem 2rem;background:#FFFFFF;border:1px dashed #E5DDF7;border-radius:14px;margin-top:1rem;">
         <div style="font-size:2.5rem;margin-bottom:0.7rem;">📭</div>
-        <div style="color:#4E4B63;font-size:0.9rem;font-weight:600;">등록된 업무가 없습니다.<br>위에서 회의록을 업로드하거나 업무를 추출해주세요.</div>
+        <div style="color:#6F6682;font-size:0.9rem;font-weight:600;">등록된 업무가 없습니다.<br>위에서 회의록을 업로드하거나 업무를 추출해주세요.</div>
     </div>
     """, unsafe_allow_html=True)
     st.stop()
@@ -161,15 +161,15 @@ pct_done = int(done / total * 100) if total else 0
 st.markdown(f"""
 <div class="metric-row">
     <div class="metric-box"><div class="metric-val">{total}</div><div class="metric-lbl">전체 업무</div></div>
-    <div class="metric-box"><div class="metric-val" style="color:#4E4B63;">{todo}</div><div class="metric-lbl">진행 예정</div></div>
-    <div class="metric-box"><div class="metric-val" style="color:#BFA8FF;">{doing}</div><div class="metric-lbl">진행 중</div></div>
-    <div class="metric-box"><div class="metric-val" style="color:#60C8F5;">{review}</div><div class="metric-lbl">검토 중</div></div>
-    <div class="metric-box"><div class="metric-val" style="color:#5ADBA9;">{done}</div><div class="metric-lbl">완료</div></div>
-    <div class="metric-box"><div class="metric-val" style="color:#FF6B6B;">{high_p}</div><div class="metric-lbl">높은 우선순위</div></div>
+    <div class="metric-box"><div class="metric-val" style="color:#6F6682;">{todo}</div><div class="metric-lbl">진행 예정</div></div>
+    <div class="metric-box"><div class="metric-val" style="color:#7C5CFF;">{doing}</div><div class="metric-lbl">진행 중</div></div>
+    <div class="metric-box"><div class="metric-val" style="color:#2496D8;">{review}</div><div class="metric-lbl">검토 중</div></div>
+    <div class="metric-box"><div class="metric-val" style="color:#17A976;">{done}</div><div class="metric-lbl">완료</div></div>
+    <div class="metric-box"><div class="metric-val" style="color:#D9364B;">{high_p}</div><div class="metric-lbl">높은 우선순위</div></div>
     <div class="metric-box"><div class="metric-val">{pct_done}%</div><div class="metric-lbl">완료율</div></div>
 </div>
-<div style="background:#1A182A;border-radius:6px;height:8px;overflow:hidden;margin-bottom:1.5rem;">
-    <div style="background:linear-gradient(90deg,#BFA8FF,#5ADBA9);height:100%;border-radius:6px;width:{pct_done}%;transition:width 0.4s;"></div>
+<div style="background:#F1ECFF;border-radius:6px;height:8px;overflow:hidden;margin-bottom:1.5rem;">
+    <div style="background:linear-gradient(90deg,#7C5CFF,#17A976);height:100%;border-radius:6px;width:{pct_done}%;transition:width 0.4s;"></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -217,7 +217,7 @@ with view_tab2:
     selected_status = st.radio("상태 필터", status_opts, horizontal=True)
 
     filtered = df_all if selected_status == "전체" else df_all[df_all["status"] == selected_status]
-    st.markdown(f'<div style="font-size:0.78rem;color:#4E4B63;margin-bottom:0.8rem;">총 {len(filtered)}개</div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="font-size:0.78rem;color:#6F6682;margin-bottom:0.8rem;">총 {len(filtered)}개</div>', unsafe_allow_html=True)
 
     if filtered.empty:
         st.info("해당 상태의 업무가 없습니다.")

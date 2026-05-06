@@ -12,7 +12,7 @@ from shared import (
     render_sidebar, clear_results, extract_keywords, summarize_meeting, extract_tasks_ai,
     branding_insight, action_and_risk, decisions, ask_able, generate_notify_messages,
     make_email_draft, compare_meetings, extract_tasks_structured, add_tasks_to_state,
-    RESULT_KEYS,
+    fetch_related_news, RESULT_KEYS,
 )
 
 st.set_page_config(
@@ -160,13 +160,13 @@ st.markdown("---")
 access = meta.get("access", "full")
 
 # Decide which tabs are visible
-all_tabs = ["📋 회의 요약", "✅ 담당자 과제", "💡 리브랜딩 인사이트", "⚙️ 실행·리스크", "🔒 결정사항", "🤖 에이블 Q&A", "📧 이메일", "🔔 알림 메시지"]
+all_tabs = ["📋 회의 요약", "✅ 담당자 과제", "💡 리브랜딩 인사이트", "⚙️ 실행·리스크", "🔒 결정사항", "🤖 에이블 Q&A", "📧 이메일", "🔔 알림 메시지", "📰 관련 뉴스"]
 tab_access = {
-    "full":      [0, 1, 2, 3, 4, 5, 6, 7],
-    "strategy":  [0, 1, 3, 4, 5, 7],
-    "shortform": [0, 1, 2, 5],
+    "full":      [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    "strategy":  [0, 1, 3, 4, 5, 7, 8],
+    "shortform": [0, 1, 2, 5, 8],
 }
-allowed = tab_access.get(access, [0, 1, 2, 3, 4, 5, 6, 7])
+allowed = tab_access.get(access, [0, 1, 2, 3, 4, 5, 6, 7, 8])
 visible_tabs = [(i, label) for i, label in enumerate(all_tabs) if i in allowed]
 
 tab_objects = st.tabs([label for _, label in visible_tabs])
@@ -364,6 +364,46 @@ if t:
         else:
             st.info("알림 메시지 생성 버튼을 눌러주세요.")
 
+
+# ── 8: 관련 뉴스 ──
+t = tab_for(8)
+if t:
+    with t:
+        st.markdown("#### 관련 트렌드 뉴스")
+        st.caption("회의 주제와 관련된 마케팅 / Z세대 / 숏폼 트렌드 뉴스 5건을 AI가 요약합니다.")
+
+        news_kw = st.text_input(
+            "검색 키워드 (선택)",
+            placeholder="예: Z세대 리브랜딩, 숏폼 바이럴 — 비워두면 회의 내용 기반으로 자동 검색",
+            key="dash_news_kw",
+        )
+        if st.button("뉴스 가져오기", key="btn_dash_news", use_container_width=False):
+            with st.spinner("뉴스 요약 중…"):
+                st.session_state["news_result"] = fetch_related_news(meeting_text, news_kw)
+
+        if st.session_state.get("news_result"):
+            articles = st.session_state["news_result"]
+            if not articles:
+                st.warning("뉴스를 가져오지 못했습니다. 다시 시도해주세요.")
+            else:
+                for i, art in enumerate(articles, 1):
+                    st.markdown(
+                        f'<div class="n-card">'
+                        f'<div class="news-source">기사 {i} · {art.get("source","")} · {art.get("date","")}</div>'
+                        f'<div class="news-title">{art.get("title","")}</div>'
+                        f'<div class="news-body">{art.get("summary","")}</div>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
+                news_text = "\n\n".join([
+                    f"[{i}] {a.get('title','')} ({a.get('source','')} / {a.get('date','')})\n{a.get('summary','')}"
+                    for i, a in enumerate(articles, 1)
+                ])
+                st.download_button("⬇ 뉴스 TXT 다운로드", data=news_text,
+                    file_name="able_news.txt", mime="text/plain", use_container_width=True)
+        else:
+            st.info("뉴스 가져오기 버튼을 눌러주세요.")
+
 # ══════════════════════════════════════════════════════════════
 # DOWNLOAD ALL
 # ══════════════════════════════════════════════════════════════
@@ -373,6 +413,7 @@ section_map = [
     ("# 리브랜딩 인사이트", "branding_result"), ("# 실행·리스크", "action_risk_result"),
     ("# 결정사항", "decisions_result"), ("# Q&A", "qa_result"),
     ("# 알림 메시지", "notify_result"), ("# 이메일 초안", "email_draft_result"),
+    ("# 관련 뉴스", "news_result"),
 ]
 report = "\n\n".join([f"{h}\n\n{st.session_state[k]}" for h, k in section_map if st.session_state.get(k)])
 if report.strip():

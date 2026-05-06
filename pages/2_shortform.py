@@ -7,7 +7,7 @@ import streamlit as st
 from shared import (
     GLOBAL_CSS, ROLES,
     render_sidebar,
-    shortform_strategy, generate_shortform_script, generate_ab_test, fetch_related_news,
+    shortform_strategy, generate_shortform_script, generate_ab_test,
 )
 
 st.set_page_config(
@@ -34,9 +34,9 @@ if access == "strategy":
     <div class="page-header">
         <div class="page-title">숏폼 스튜디오</div>
     </div>
-    <div style="background:#13121E;border:1px dashed #2E2B48;border-radius:14px;padding:3rem 2rem;text-align:center;margin-top:1rem;">
+    <div style="background:#FFFFFF;border:1px dashed #D5C8EE;border-radius:14px;padding:3rem 2rem;text-align:center;margin-top:1rem;">
         <div style="font-size:2.5rem;margin-bottom:0.7rem;">🔒</div>
-        <div style="color:#6B6680;font-size:0.9rem;font-weight:600;">이 페이지는 접근 권한이 없습니다.<br>담당자에게 문의해주세요.</div>
+        <div style="color:#766D8A;font-size:0.9rem;font-weight:600;">이 페이지는 접근 권한이 없습니다.<br>담당자에게 문의해주세요.</div>
     </div>
     """, unsafe_allow_html=True)
     st.stop()
@@ -48,7 +48,7 @@ st.markdown(f"""
 <div class="page-header">
     <div class="page-title">숏폼 스튜디오</div>
     <div class="page-subtitle" style="color:{color};">
-        {meta['emoji']} {user} · 숏폼 전략 · 스크립트 · A/B 테스트 · 뉴스
+        {meta['emoji']} {user} · 숏폼 전략 · 스크립트 · A/B 테스트
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -74,10 +74,10 @@ with st.expander("📝 참고 회의록 (직접 입력 / 수정 가능)", expand
 st.markdown("---")
 
 # ══════════════════════════════════════════════════════════════
-# FOUR TABS
+# THREE TABS
 # ══════════════════════════════════════════════════════════════
-tab_strategy, tab_script, tab_ab, tab_news = st.tabs([
-    "🎬 숏폼 전략", "🎥 스크립트 생성", "🔀 A/B 테스트", "📰 관련 뉴스",
+tab_strategy, tab_script, tab_ab = st.tabs([
+    "🎬 숏폼 전략", "🎥 스크립트 생성", "🔀 A/B 테스트",
 ])
 
 # ── 숏폼 전략 ──
@@ -135,40 +135,3 @@ with tab_ab:
             file_name="able_ab.txt", mime="text/plain")
     else:
         st.info("생성 버튼을 눌러주세요.")
-
-# ── 관련 뉴스 ──
-with tab_news:
-    st.markdown("#### 관련 트렌드 뉴스")
-    st.caption("회의 주제와 관련된 마케팅 / Z세대 / 숏폼 트렌드 뉴스 5건을 AI가 요약합니다.")
-
-    news_kw = st.text_input(
-        "검색 키워드 (선택)",
-        placeholder="예: Z세대 리브랜딩, 숏폼 바이럴 — 비워두면 회의 내용 기반으로 자동 검색",
-        key="sf_news_kw",
-    )
-    if st.button("뉴스 가져오기", key="btn_news", use_container_width=False):
-        with st.spinner("뉴스 요약 중…"):
-            st.session_state["news_result"] = fetch_related_news(meeting_text, news_kw)
-
-    if st.session_state.get("news_result"):
-        articles = st.session_state["news_result"]
-        if not articles:
-            st.warning("뉴스를 가져오지 못했습니다. 다시 시도해주세요.")
-        else:
-            for i, art in enumerate(articles, 1):
-                st.markdown(
-                    f'<div class="n-card">'
-                    f'<div class="news-source">기사 {i} · {art.get("source","")} · {art.get("date","")}</div>'
-                    f'<div class="news-title">{art.get("title","")}</div>'
-                    f'<div class="news-body">{art.get("summary","")}</div>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-            news_text = "\n\n".join([
-                f"[{i}] {a.get('title','')} ({a.get('source','')} / {a.get('date','')})\n{a.get('summary','')}"
-                for i, a in enumerate(articles, 1)
-            ])
-            st.download_button("⬇ 뉴스 TXT 다운로드", data=news_text,
-                file_name="able_news.txt", mime="text/plain")
-    else:
-        st.info("뉴스 가져오기 버튼을 눌러주세요.")
