@@ -3,18 +3,264 @@ import requests
 import streamlit as st
 from openai import OpenAI
 
-
+# ══════════════════════════════════════════════════════════════
+# PAGE CONFIG
+# ══════════════════════════════════════════════════════════════
 st.set_page_config(
     page_title="에이블 | Z세대 리브랜딩 전략 AI 비서",
     page_icon="🧠",
     layout="wide"
 )
+st.caption("APP VERSION: able-colab-streamlit-v3")
 
-st.caption("APP VERSION: able-colab-streamlit-v2")
+# ══════════════════════════════════════════════════════════════
+# PREMIUM CSS
+# ══════════════════════════════════════════════════════════════
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Syne:wght@700;800&display=swap');
 
+html, body, [class*="css"] { font-family: 'DM Sans', sans-serif !important; }
 
+.stApp {
+    background: linear-gradient(160deg, #080b12 0%, #0d1120 55%, #070a10 100%);
+    color: #c9d4e8;
+}
+.main .block-container { padding-top: 2rem; max-width: 980px; }
+
+/* Title */
+h1 {
+    font-family: 'Syne', sans-serif !important;
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.025em !important;
+    background: linear-gradient(90deg, #4F8EF7 0%, #9B59F7 60%, #F4845F 100%);
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    margin-bottom: 0.1rem !important;
+}
+h2, h3 {
+    font-family: 'Syne', sans-serif !important;
+    font-weight: 700 !important;
+    color: #b8c8e4 !important;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: #080b12 !important;
+    border-right: 1px solid #151d2e !important;
+}
+
+/* Buttons */
+.stButton > button {
+    background: linear-gradient(135deg, #151d2e 0%, #1c2540 100%) !important;
+    color: #96aad0 !important;
+    border: 1px solid #232e48 !important;
+    border-radius: 10px !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-weight: 500 !important;
+    transition: all 0.22s ease !important;
+    padding: 0.55rem 1.2rem !important;
+}
+.stButton > button:hover {
+    border-color: #4F8EF7 !important;
+    color: #e8f0ff !important;
+    box-shadow: 0 4px 24px rgba(79,142,247,0.22) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Inputs */
+textarea, input[type="text"] {
+    background: #0d1220 !important;
+    color: #c2d0ea !important;
+    border: 1px solid #1e2a42 !important;
+    border-radius: 10px !important;
+    font-family: 'DM Sans', sans-serif !important;
+}
+textarea:focus, input[type="text"]:focus {
+    border-color: #4F8EF7 !important;
+    box-shadow: 0 0 0 2px rgba(79,142,247,0.18) !important;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    background: #0a0e18 !important;
+    border-radius: 12px !important;
+    gap: 3px !important;
+    padding: 4px !important;
+    border: 1px solid #151d2e !important;
+}
+.stTabs [data-baseweb="tab"] {
+    background: transparent !important;
+    color: #4a5c7c !important;
+    border-radius: 8px !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    transition: all 0.18s !important;
+}
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, #192040, #1c2848) !important;
+    color: #6aA4FF !important;
+    border-bottom: 2px solid #4F8EF7 !important;
+}
+
+/* Divider */
+hr { border-color: #141c2e !important; }
+
+/* Expander */
+details summary { color: #6070a0 !important; font-size: 0.88rem !important; }
+
+/* ── Login UI ──────────────────────────── */
+.login-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 0 2rem;
+}
+.login-hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #4F8EF7 0%, #9B59F7 55%, #F4845F 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+.login-hero-sub {
+    color: #3a4d6e;
+    font-size: 0.9rem;
+    letter-spacing: 0.06em;
+    text-align: center;
+    margin-top: 0.5rem;
+    margin-bottom: 2.5rem;
+}
+.role-card {
+    background: linear-gradient(135deg, #101728 0%, #161f38 100%);
+    border: 1.5px solid #1e2a44;
+    border-radius: 16px;
+    padding: 1.1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 8px;
+    transition: all 0.22s ease;
+    position: relative;
+    overflow: hidden;
+}
+.role-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+}
+.role-card .r-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #d8e4f5;
+}
+.role-card .r-desc {
+    font-size: 0.76rem;
+    margin-top: 2px;
+}
+.role-avatar {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+.r-arrow { margin-left: auto; font-size: 1rem; opacity: 0.4; }
+
+/* ── Sidebar Badge ─────────────────────── */
+.user-badge {
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+.badge-role {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.badge-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #d8e4f5;
+}
+.badge-desc {
+    font-size: 0.74rem;
+    color: #3a4d6e;
+    margin-top: 2px;
+}
+
+/* ── Access Denied ─────────────────────── */
+.access-denied {
+    background: #0d0f18;
+    border: 1px dashed #25183a;
+    border-radius: 14px;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #3a2a55;
+    margin-top: 1rem;
+}
+.access-denied .ad-icon { font-size: 2.2rem; margin-bottom: 0.8rem; }
+.access-denied .ad-title { color: #6a4888; font-size: 1rem; font-weight: 600; }
+.access-denied .ad-sub { margin-top: 0.5rem; font-size: 0.85rem; }
+</style>
+""", unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════
+# ROLE DEFINITIONS
+# ══════════════════════════════════════════════════════════════
+ROLES = {
+    "김부장": {
+        "title": "부장",
+        "color": "#4F8EF7",
+        "description": "전략 총괄 · 최종 결재",
+        "allowed_tabs": [0, 1, 2, 3, 4, 5, 6, 7],
+    },
+    "박팀장": {
+        "title": "팀장",
+        "color": "#F4845F",
+        "description": "실행 총괄 · 팀 조율",
+        "allowed_tabs": [0, 1, 2, 3, 4, 5, 6, 7],
+    },
+    "이과장": {
+        "title": "과장",
+        "color": "#9B59F7",
+        "description": "퍼포먼스 마케팅 · 인플루언서",
+        "allowed_tabs": [0, 1, 4, 6],
+    },
+    "김대리": {
+        "title": "대리",
+        "color": "#2ECC8E",
+        "description": "브랜드 리서치 · 숏폼 콘텐츠",
+        "allowed_tabs": [0, 1, 2, 3, 6],
+    },
+}
+
+TAB_LABELS = [
+    ("📋", "회의 요약"),
+    ("✅", "담당자별 과제"),
+    ("💡", "리브랜딩 인사이트"),
+    ("🎬", "숏폼 전략"),
+    ("⚙️", "실행 계획·리스크"),
+    ("🔒", "결정사항"),
+    ("🤖", "에이블 Q&A"),
+    ("📧", "이메일 발송"),
+]
+
+# ══════════════════════════════════════════════════════════════
+# SECRETS / ENV
+# ══════════════════════════════════════════════════════════════
 DEFAULT_EMAIL_ADDRESS = "mememeco8@gmail.com"
-
 
 def get_secret_or_env(key: str, default=None):
     try:
@@ -22,94 +268,142 @@ def get_secret_or_env(key: str, default=None):
     except Exception:
         return os.getenv(key, default)
 
-
-OPENAI_API_KEY = get_secret_or_env("OPENAI_API_KEY")
+OPENAI_API_KEY   = get_secret_or_env("OPENAI_API_KEY")
 SENDGRID_API_KEY = get_secret_or_env("SENDGRID_API_KEY")
-EMAIL_ADDRESS = get_secret_or_env("EMAIL_ADDRESS", DEFAULT_EMAIL_ADDRESS)
-
+EMAIL_ADDRESS    = get_secret_or_env("EMAIL_ADDRESS", DEFAULT_EMAIL_ADDRESS)
 
 if not OPENAI_API_KEY:
-    st.error("OPENAI_API_KEY가 없습니다. Colab에서 환경변수를 먼저 설정하세요.")
+    st.error("OPENAI_API_KEY가 없습니다.")
     st.stop()
-
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-
+# ══════════════════════════════════════════════════════════════
+# PROJECT CONTEXT
+# ══════════════════════════════════════════════════════════════
 PROJECT_CONTEXT = """
 [프로젝트 배경 및 문제 정의]
-
-1. 핵심 과제:
-전통의 현대화 - Z세대 타겟 리브랜딩 및 숏폼 확산 전략
-
-20년 된 장수 브랜드의 '아빠 브랜드' 이미지를 탈피하기 위해,
-브랜드 정체성을 재정립함과 동시에 저예산 고효율 매체인 숏폼을 활용하여
-Z세대에게 브랜드 인지도를 확산시키는 것을 목표로 한다.
+1. 핵심 과제: 전통의 현대화 - Z세대 타겟 리브랜딩 및 숏폼 확산 전략
+20년 된 장수 브랜드의 '아빠 브랜드' 이미지를 탈피하기 위해, 브랜드 정체성을 재정립함과 동시에
+저예산 고효율 매체인 숏폼을 활용하여 Z세대에게 브랜드 인지도를 확산시키는 것을 목표로 한다.
 
 2. 현재 상황 및 당면 문제
-
-브랜드 위기:
-- 장수 브랜드로서의 신뢰도는 높으나, 1020 세대와의 접점이 없어 신규 유입이 단절됨.
-
-자원 한계:
-- 대규모 TV CF 등 전통적 광고 예산은 제한적임.
-- 아이디어 고갈로 인해 디지털 트렌드 대응력이 낮아진 상태.
-
-전략적 공백:
-- Z세대가 좋아하는 톤앤매너와 구매로 이어지는 숏폼 마케팅 공식에 대한 데이터가 부족함.
+브랜드 위기: 장수 브랜드로서의 신뢰도는 높으나, 1020 세대와의 접점이 없어 신규 유입이 단절됨.
+자원 한계: 대규모 TV CF 등 전통적 광고 예산은 제한적임. 아이디어 고갈로 디지털 트렌드 대응력이 낮아진 상태.
+전략적 공백: Z세대가 좋아하는 톤앤매너와 구매로 이어지는 숏폼 마케팅 공식에 대한 데이터가 부족함.
 
 3. 주요 수행 업무
-
-Part 1. 브랜드 이미지 쇄신 로직
-- 글로벌 성공 사례 분석
-- Z세대 커뮤니케이션 방식, 톤앤매너, 팝업스토어 트렌드 조사
-
-Part 2. 디지털 확산 및 전환 전략
-- 숏폼 성공 공식 도출
-- 인플루언서 협업 성공 사례 리서치
-
-4. AI 비서 에이블의 역할
-- 회의 분석
-- 담당자별 업무 구분
-- 리브랜딩 및 숏폼 전략 질의응답
-- 이메일 브리핑 생성 및 발송
+Part 1. 브랜드 이미지 쇄신 로직 - 글로벌 성공 사례 분석 / Z세대 커뮤니케이션 방식, 팝업스토어 트렌드 조사
+Part 2. 디지털 확산 및 전환 전략 - 숏폼 성공 공식 도출 / 인플루언서 협업 성공 사례 리서치
 """
-
 
 DEFAULT_MEETING1_TEXT = """
 오늘 회의에서는 20년 된 장수 브랜드의 Z세대 리브랜딩 방향을 논의했다.
 현재 브랜드는 신뢰도는 높지만 1020 세대에게는 아빠 브랜드 이미지가 강하다는 점이 문제로 제기되었다.
-
 김 대리는 올드스파이스와 구찌의 리브랜딩 사례를 조사하기로 했다.
 박 대리는 최근 3개월간 틱톡과 릴스에서 바이럴된 챌린지 사례를 정리하기로 했다.
 이 과장은 인플루언서 협업을 통한 구매 전환 사례를 조사하기로 했다.
-
 팀에서는 대규모 TV 광고보다 숏폼 중심의 저예산 확산 전략이 필요하다고 판단했다.
 다만 브랜드 정체성을 훼손하지 않으면서 Z세대에게 어색하지 않은 톤앤매너를 찾는 것이 중요하다는 의견이 있었다.
-
-다음 회의 전까지 각자 조사한 내용을 공유하고, 이를 바탕으로 숏폼 챌린지 아이디어를 3개 이상 제안하기로 했다.
+다음 회의 전까지 각자 조사한 내용을 공유하고, 숏폼 챌린지 아이디어를 3개 이상 제안하기로 했다.
 """
 
+# ══════════════════════════════════════════════════════════════
+# LOGIN SCREEN
+# ══════════════════════════════════════════════════════════════
+def show_login():
+    st.markdown("""
+    <div class="login-wrapper">
+        <div class="login-hero-title">에이블</div>
+        <div class="login-hero-sub">Z세대 리브랜딩 전략 AI 비서 &nbsp;·&nbsp; 담당자를 선택하세요</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-def ask_ai(task_title: str, user_input: str, output_instruction: str) -> str:
+    col = st.columns([1, 2, 1])[1]
+    with col:
+        for name, meta in ROLES.items():
+            color = meta["color"]
+            st.markdown(f"""
+            <div class="role-card" style="border-color:{color}33;">
+                <div class="role-avatar" style="background:{color}18; border:1.5px solid {color}44;">
+                    👤
+                </div>
+                <div>
+                    <div class="r-name">{name}</div>
+                    <div class="r-desc" style="color:{color}99;">{meta['title']} · {meta['description']}</div>
+                </div>
+                <div class="r-arrow" style="color:{color};">→</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            if st.button(f"  {name} 으로 시작하기  ", key=f"login_{name}", use_container_width=True):
+                st.session_state["logged_in_user"] = name
+                st.rerun()
+
+# ══════════════════════════════════════════════════════════════
+# SIDEBAR BADGE
+# ══════════════════════════════════════════════════════════════
+def render_sidebar():
+    user = st.session_state.get("logged_in_user")
+    if not user:
+        return
+    meta  = ROLES[user]
+    color = meta["color"]
+
+    with st.sidebar:
+        st.markdown(f"""
+        <div class="user-badge" style="background:linear-gradient(135deg,#0d1220,#131d38);
+             border:1.5px solid {color}33;">
+            <div class="badge-role" style="color:{color};">접속 중</div>
+            <div class="badge-name">{user}</div>
+            <div class="badge-desc">{meta['title']} · {meta['description']}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        if st.button("⇠  로그아웃", use_container_width=True):
+            st.session_state.pop("logged_in_user", None)
+            st.rerun()
+
+        st.markdown("---")
+        st.markdown(f"<div style='font-size:0.7rem;color:#2a3a58;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;'>접근 가능 메뉴</div>", unsafe_allow_html=True)
+        for i in meta["allowed_tabs"]:
+            icon, label = TAB_LABELS[i]
+            st.markdown(f"<div style='font-size:0.82rem;color:#4a6090;padding:3px 0;'>"
+                        f"<span style='color:{color};margin-right:6px;'>▸</span>{icon} {label}</div>",
+                        unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════
+# ACCESS GUARD
+# ══════════════════════════════════════════════════════════════
+def can_access(tab_index: int) -> bool:
+    user = st.session_state.get("logged_in_user")
+    if not user or user not in ROLES:
+        return False
+    return tab_index in ROLES[user]["allowed_tabs"]
+
+def show_access_denied(tab_index: int):
+    _, label = TAB_LABELS[tab_index]
+    st.markdown(f"""
+    <div class="access-denied">
+        <div class="ad-icon">🔒</div>
+        <div class="ad-title">{label}</div>
+        <div class="ad-sub">현재 계정의 접근 권한이 없는 메뉴입니다.</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════
+# AI HELPERS  (기존 함수 동일)
+# ══════════════════════════════════════════════════════════════
+def ask_ai(task_title, user_input, output_instruction):
     if not user_input or not user_input.strip():
         return "입력 내용이 없습니다."
-
     prompt = f"""
-너는 AI 비서 '에이블'이다.
-
-아래 프로젝트 배경을 반영하라.
-
+너는 AI 비서 '에이블'이다. 아래 프로젝트 배경을 반영하라.
 {PROJECT_CONTEXT}
 
-[분석 목적]
-{task_title}
-
-[사용자 입력]
-{user_input}
-
-[출력 지시]
-{output_instruction}
+[분석 목적] {task_title}
+[사용자 입력] {user_input}
+[출력 지시] {output_instruction}
 
 [공통 규칙]
 - 한국어로 작성
@@ -118,535 +412,341 @@ def ask_ai(task_title: str, user_input: str, output_instruction: str) -> str:
 - 표가 적합하면 Markdown 표로 작성
 - Z세대 리브랜딩과 숏폼 확산 전략 관점에서 해석
 """
-
-    response = client.chat.completions.create(
+    resp = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {
-                "role": "system",
-                "content": "너는 Z세대 리브랜딩과 숏폼 확산 전략을 지원하는 AI 비서 에이블이다."
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
+            {"role": "system", "content": "너는 Z세대 리브랜딩과 숏폼 확산 전략을 지원하는 AI 비서 에이블이다."},
+            {"role": "user",   "content": prompt}
         ],
         temperature=0.2
     )
+    return resp.choices[0].message.content
 
-    return response.choices[0].message.content
+def summarize_meeting(t):
+    return ask_ai("회의 핵심 요약", t,
+        "1.회의 목적 2.핵심 논의 3.리브랜딩 논의 4.숏폼 논의 5.확정 사항 6.미해결 7.다음 회의 확인 항목")
 
+def extract_tasks(t):
+    return ask_ai("담당자별 과제 추출", t,
+        "| 담당자 | 업무 | 관련 파트 | 마감일 | 우선순위 | 근거 | 형식의 Markdown 표로 정리")
 
-def summarize_meeting(meeting1_text: str) -> str:
-    return ask_ai(
-        "회의 핵심 요약",
-        meeting1_text,
-        """
-다음 항목으로 정리하라.
+def branding_insight(t):
+    return ask_ai("리브랜딩 인사이트", t,
+        "1.기존 이미지 문제 2.새 이미지 방향 3.유지할 자산 4.버릴 이미지 5.글로벌 사례 방향 6.팝업 아이디어 7.톤앤매너")
 
-1. 회의 목적
-2. 핵심 논의 내용
-3. 리브랜딩 관련 논의
-4. 숏폼 확산 전략 관련 논의
-5. 확정된 내용
-6. 미해결 사항
-7. 다음 회의에서 확인할 사항
-"""
-    )
+def shortform_strategy(t):
+    return ask_ai("숏폼 확산 전략", t,
+        "1.핵심 메시지 2.톤앤매너 3.챌린지/밈 4.플랫폼별 방향 5.인플루언서 협업 6.구매 전환 장치 7.저예산 실험안")
 
+def action_and_risk(t):
+    return ask_ai("실행 계획 및 리스크", t,
+        "실행 계획 표 (번호|실행항목|담당자|마감일|우선순위|산출물) + 리스크 표 (번호|유형|내용|영향|대응)")
 
-def extract_tasks(meeting1_text: str) -> str:
-    return ask_ai(
-        "담당자별 리서치 및 실행 과제 추출",
-        meeting1_text,
-        """
-회의록에서 담당자별 업무를 추출하라.
+def decisions(t):
+    return ask_ai("결정사항 추출", t,
+        "| 번호 | 결정사항 | 관련 영역 | 결정 배경 | 후속 조치 | 근거 | 형식의 표만 작성")
 
-| 담당자 | 업무 | 관련 파트 | 마감일 | 우선순위 | 근거 |
-|---|---|---|---|---|---|
+def ask_able(question, reference_text):
+    return ask_ai("에이블 Q&A", f"[참고]\n{reference_text}\n\n[질문]\n{question}",
+        "1.핵심 답변 2.근거 3.리브랜딩 시사점 4.숏폼 시사점 5.즉시 실행 액션")
 
-관련 파트:
-- 브랜드 이미지 쇄신
-- Z세대 타겟팅
-- 숏폼 성공 공식
-- 퍼포먼스 마케팅
-- 실행 관리
-- 기타
-"""
-    )
-
-
-def branding_insight(meeting1_text: str) -> str:
-    return ask_ai(
-        "리브랜딩 인사이트 도출",
-        meeting1_text,
-        """
-다음 항목으로 정리하라.
-
-1. 기존 브랜드 이미지 문제
-2. Z세대에게 새롭게 보여줘야 할 브랜드 이미지
-3. 유지해야 할 기존 브랜드 자산
-4. 버려야 할 낡은 이미지
-5. 참고 가능한 글로벌 사례 방향
-6. 팝업스토어 또는 공간 경험 아이디어
-7. 커뮤니케이션 톤앤매너 제안
-"""
-    )
-
-
-def shortform_strategy(meeting1_text: str) -> str:
-    return ask_ai(
-        "숏폼 확산 전략 도출",
-        meeting1_text,
-        """
-다음 항목으로 정리하라.
-
-1. 숏폼 콘텐츠 핵심 메시지
-2. Z세대가 반응할 만한 톤앤매너
-3. 챌린지 또는 밈 아이디어
-4. 틱톡, 릴스, 쇼츠별 활용 방향
-5. 인플루언서 협업 방향
-6. 조회수 이후 구매 전환 장치
-7. 저예산 콘텐츠 실험안
-"""
-    )
-
-
-def action_and_risk(meeting1_text: str) -> str:
-    return ask_ai(
-        "실행 계획 및 리스크 분석",
-        meeting1_text,
-        """
-먼저 실행 계획 표를 작성하라.
-
-| 번호 | 실행 항목 | 담당자 | 마감일 | 우선순위 | 산출물 |
-|---|---|---|---|---|---|
-
-다음으로 리스크 표를 작성하라.
-
-| 번호 | 리스크 유형 | 리스크 내용 | 영향 | 대응 방안 |
-|---|---|---|---|---|
-
-리스크 유형:
-- 브랜드 정체성 훼손
-- Z세대 부적합
-- 숏폼 확산 실패
-- 구매 전환 약함
-- 리서치 부족
-- 실행 리소스 부족
-- 기타
-"""
-    )
-
-
-def decisions(meeting1_text: str) -> str:
-    return ask_ai(
-        "전략 결정사항 추출",
-        meeting1_text,
-        """
-회의에서 확정된 결정사항만 추출하라.
-
-| 번호 | 결정사항 | 관련 영역 | 결정 배경 | 후속 조치 | 근거 |
-|---|---|---|---|---|---|
-"""
-    )
-
-
-def ask_able(question: str, reference_text: str) -> str:
-    return ask_ai(
-        "에이블 전략 질의응답",
-        f"""
-[참고 자료]
-{reference_text}
-
-[질문]
-{question}
-""",
-        """
-답변 구조:
-1. 핵심 답변
-2. 근거
-3. 리브랜딩 관점 시사점
-4. 숏폼 전략 관점 시사점
-5. 바로 실행할 수 있는 액션
-"""
-    )
-
-
-def send_email(to: str, subject: str, body: str) -> dict:
+def send_email(to, subject, body):
     if not SENDGRID_API_KEY:
-        return {
-            "status": "failed",
-            "error": "SENDGRID_API_KEY가 없습니다."
-        }
-
+        return {"status": "failed", "error": "SENDGRID_API_KEY 없음"}
     if not to or "@" not in to:
-        return {
-            "status": "failed",
-            "error": "수신자 이메일 주소가 올바르지 않습니다."
-        }
-
+        return {"status": "failed", "error": "이메일 주소 오류"}
     url = "https://api.sendgrid.com/v3/mail/send"
-
-    headers = {
-        "Authorization": f"Bearer {SENDGRID_API_KEY}",
-        "Content-Type": "application/json"
-    }
-
+    headers = {"Authorization": f"Bearer {SENDGRID_API_KEY}", "Content-Type": "application/json"}
     data = {
-        "personalizations": [
-            {
-                "to": [{"email": to}],
-                "subject": subject
-            }
-        ],
+        "personalizations": [{"to": [{"email": to}], "subject": subject}],
         "from": {"email": EMAIL_ADDRESS},
-        "content": [
-            {
-                "type": "text/plain",
-                "value": body
-            }
-        ]
+        "content": [{"type": "text/plain", "value": body}]
     }
-
     try:
-        response = requests.post(url, headers=headers, json=data, timeout=20)
-
-        if response.status_code == 202:
-            return {"status": "success"}
-
-        return {
-            "status": "failed",
-            "status_code": response.status_code,
-            "error": response.text
-        }
-
+        r = requests.post(url, headers=headers, json=data, timeout=20)
+        return {"status": "success"} if r.status_code == 202 else {"status": "failed", "error": r.text}
     except Exception as e:
-        return {
-            "status": "failed",
-            "error": str(e)
-        }
+        return {"status": "failed", "error": str(e)}
 
-
-RESULT_KEYS = [
-    "summary_result",
-    "tasks_result",
-    "branding_result",
-    "shortform_result",
-    "action_risk_result",
-    "decisions_result",
-    "qa_result",
-    "email_draft_result"
-]
-
+# ── result key helpers ──
+RESULT_KEYS = ["summary_result","tasks_result","branding_result","shortform_result",
+               "action_risk_result","decisions_result","qa_result","email_draft_result"]
 
 def clear_results():
-    for key in RESULT_KEYS:
-        st.session_state.pop(key, None)
+    for k in RESULT_KEYS:
+        st.session_state.pop(k, None)
 
-
-def build_report_text(include_email=True) -> str:
-    report = ""
-
+def build_report_text(include_email=True):
     sections = [
-        ("# 1. 회의 핵심 요약", "summary_result"),
-        ("# 2. 담당자별 리서치 과제", "tasks_result"),
-        ("# 3. 리브랜딩 인사이트", "branding_result"),
-        ("# 4. 숏폼 확산 전략", "shortform_result"),
-        ("# 5. 실행 계획 및 리스크", "action_risk_result"),
-        ("# 6. 전략 결정사항", "decisions_result"),
-        ("# 7. 에이블 질의응답", "qa_result"),
+        ("# 1. 회의 핵심 요약",      "summary_result"),
+        ("# 2. 담당자별 과제",        "tasks_result"),
+        ("# 3. 리브랜딩 인사이트",    "branding_result"),
+        ("# 4. 숏폼 확산 전략",       "shortform_result"),
+        ("# 5. 실행 계획 및 리스크",  "action_risk_result"),
+        ("# 6. 전략 결정사항",        "decisions_result"),
+        ("# 7. 에이블 Q&A",           "qa_result"),
     ]
-
+    report = ""
     for title, key in sections:
         if key in st.session_state:
-            report += title + "\n\n"
-            report += st.session_state[key] + "\n\n"
-
+            report += title + "\n\n" + st.session_state[key] + "\n\n"
     if include_email and "email_draft_result" in st.session_state:
-        report += "# 8. 이메일 초안\n\n"
-        report += st.session_state["email_draft_result"] + "\n\n"
-
+        report += "# 8. 이메일 초안\n\n" + st.session_state["email_draft_result"] + "\n\n"
     return report
 
+def run_all_analysis(t):
+    st.session_state["summary_result"]     = summarize_meeting(t)
+    st.session_state["tasks_result"]       = extract_tasks(t)
+    st.session_state["branding_result"]    = branding_insight(t)
+    st.session_state["shortform_result"]   = shortform_strategy(t)
+    st.session_state["action_risk_result"] = action_and_risk(t)
+    st.session_state["decisions_result"]   = decisions(t)
 
-def run_all_analysis(meeting1_text):
-    st.session_state["summary_result"] = summarize_meeting(meeting1_text)
-    st.session_state["tasks_result"] = extract_tasks(meeting1_text)
-    st.session_state["branding_result"] = branding_insight(meeting1_text)
-    st.session_state["shortform_result"] = shortform_strategy(meeting1_text)
-    st.session_state["action_risk_result"] = action_and_risk(meeting1_text)
-    st.session_state["decisions_result"] = decisions(meeting1_text)
+def make_email_draft(t, recipient_name, sender_name):
+    prev = build_report_text(include_email=False)
+    return ask_ai("이메일 초안",
+        f"[회의록]\n{t}\n\n[분석 결과]\n{prev}\n\n[수신자] {recipient_name} / [발신자] {sender_name}",
+        "업무 이메일 톤으로 회의 핵심·담당자 업무·리브랜딩·숏폼·실행 계획 포함한 브리핑 작성. 제목 포함.")
 
+# ══════════════════════════════════════════════════════════════
+# LOGIN GATE
+# ══════════════════════════════════════════════════════════════
+if "logged_in_user" not in st.session_state:
+    show_login()
+    st.stop()
 
-def make_email_draft(meeting1_text, recipient_name, sender_name):
-    previous_results = build_report_text(include_email=False)
+render_sidebar()
 
-    return ask_ai(
-        "이메일 브리핑 초안 작성",
-        f"""
-[회의록]
-{meeting1_text}
+# ══════════════════════════════════════════════════════════════
+# MAIN HEADER
+# ══════════════════════════════════════════════════════════════
+user      = st.session_state["logged_in_user"]
+user_meta = ROLES[user]
+color     = user_meta["color"]
 
-[기존 분석 결과]
-{previous_results}
-
-[수신자]
-{recipient_name}
-
-[발신자]
-{sender_name}
-""",
-        """
-아래 형식으로 이메일 초안을 작성하라.
-
-제목:
-[에이블 브리핑] Z세대 리브랜딩 및 숏폼 확산 전략 회의 정리
-
-본문:
-- 업무용 이메일 톤
-- 회의 핵심 요약
-- 담당자별 할 일
-- 리브랜딩 인사이트
-- 숏폼 전략
-- 실행 계획
-- 확인 필요한 사항
-- 마무리 문장
-"""
-    )
-
-
-st.title("에이블 | Z세대 리브랜딩 전략 AI 비서")
-
-st.write(
-    "회의록을 입력하면 리브랜딩 인사이트, 숏폼 확산 전략, 담당자별 과제, 실행 리스크, 전략 질의응답, 이메일 브리핑 초안을 생성하고 SendGrid로 발송합니다."
+st.title("에이블")
+st.markdown(
+    f"<span style='color:{color};font-size:0.85rem;font-weight:500;'>"
+    f"👤 {user} ({user_meta['title']})</span>"
+    f"<span style='color:#2a3a58;font-size:0.85rem;'> · Z세대 리브랜딩 전략 AI 비서</span>",
+    unsafe_allow_html=True
 )
 
 with st.expander("프로젝트 배경 보기"):
     st.markdown(PROJECT_CONTEXT)
 
 with st.expander("시스템 설정 확인"):
-    st.write("OpenAI API Key 로드:", bool(OPENAI_API_KEY))
-    st.write("SendGrid API Key 로드:", bool(SENDGRID_API_KEY))
-    st.write("발신자 이메일:", EMAIL_ADDRESS)
+    st.write("OpenAI API Key:", bool(OPENAI_API_KEY))
+    st.write("SendGrid API Key:", bool(SENDGRID_API_KEY))
+    st.write("발신자:", EMAIL_ADDRESS)
 
+# ══════════════════════════════════════════════════════════════
+# MEETING INPUT
+# ══════════════════════════════════════════════════════════════
 if "meeting1_text" not in st.session_state:
     st.session_state["meeting1_text"] = DEFAULT_MEETING1_TEXT
 
 uploaded_file = st.file_uploader("회의록 파일 업로드", type=["txt", "md"])
-
 if uploaded_file is not None:
     uploaded_text = uploaded_file.read().decode("utf-8")
-
     if st.session_state.get("last_uploaded_file") != uploaded_file.name:
         st.session_state["meeting1_text"] = uploaded_text
         st.session_state["last_uploaded_file"] = uploaded_file.name
         clear_results()
         st.rerun()
 
-col_input_1, col_input_2 = st.columns([1, 1])
-
-with col_input_1:
+c1, c2 = st.columns(2)
+with c1:
     if st.button("예시 회의록 불러오기", use_container_width=True):
         st.session_state["meeting1_text"] = DEFAULT_MEETING1_TEXT
         clear_results()
         st.rerun()
-
-with col_input_2:
+with c2:
     if st.button("입력창 비우기", use_container_width=True):
         st.session_state["meeting1_text"] = ""
         clear_results()
         st.rerun()
 
 meeting1_text = st.text_area(
-    "meeting1_text",
+    "회의록",
     key="meeting1_text",
-    height=300,
-    placeholder="회의록 내용을 입력하세요."
+    height=260,
+    placeholder="회의록 내용을 입력하세요.",
+    label_visibility="collapsed"
 )
+st.caption(f"글자 수: {len(meeting1_text)}")
 
-st.write("현재 회의록 글자 수:", len(meeting1_text))
-
-col_action_1, col_action_2 = st.columns([1, 1])
-
-with col_action_1:
-    if st.button("전체 분석 실행", use_container_width=True):
-        with st.spinner("에이블이 전체 분석 중입니다..."):
+ca, cb = st.columns(2)
+with ca:
+    if st.button("⚡  전체 분석 실행", use_container_width=True):
+        with st.spinner("에이블이 분석 중입니다..."):
             run_all_analysis(meeting1_text)
-
-with col_action_2:
-    if st.button("분석 결과 초기화", use_container_width=True):
+with cb:
+    if st.button("↺  분석 초기화", use_container_width=True):
         clear_results()
         st.rerun()
 
 st.divider()
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-    "1. 회의 요약",
-    "2. 담당자별 과제",
-    "3. 리브랜딩 인사이트",
-    "4. 숏폼 전략",
-    "5. 실행 계획·리스크",
-    "6. 결정사항",
-    "7. 에이블 Q&A",
-    "8. 이메일 발송"
-])
+# ══════════════════════════════════════════════════════════════
+# TABS
+# ══════════════════════════════════════════════════════════════
+tab_labels = [f"{icon} {label}" for icon, label in TAB_LABELS]
+tabs = st.tabs(tab_labels)
 
-with tab1:
-    st.subheader("1. 회의 핵심 요약")
-
-    if st.button("회의 요약 생성", key="summary_btn"):
-        with st.spinner("회의 요약 생성 중..."):
-            st.session_state["summary_result"] = summarize_meeting(meeting1_text)
-
-    if "summary_result" in st.session_state:
-        st.markdown(st.session_state["summary_result"])
+# ── Tab 0: 회의 요약 ──
+with tabs[0]:
+    if not can_access(0):
+        show_access_denied(0)
     else:
-        st.info("아직 회의 요약 결과가 없습니다.")
+        st.subheader("📋 회의 핵심 요약")
+        if st.button("요약 생성", key="btn_summary"):
+            with st.spinner("생성 중..."):
+                st.session_state["summary_result"] = summarize_meeting(meeting1_text)
+        if "summary_result" in st.session_state:
+            st.markdown(st.session_state["summary_result"])
+        else:
+            st.info("아직 결과가 없습니다.")
 
-with tab2:
-    st.subheader("2. 담당자별 리서치 과제")
-
-    if st.button("담당자별 과제 추출", key="tasks_btn"):
-        with st.spinner("담당자별 과제 추출 중..."):
-            st.session_state["tasks_result"] = extract_tasks(meeting1_text)
-
-    if "tasks_result" in st.session_state:
-        st.markdown(st.session_state["tasks_result"])
+# ── Tab 1: 담당자별 과제 ──
+with tabs[1]:
+    if not can_access(1):
+        show_access_denied(1)
     else:
-        st.info("아직 담당자별 과제 결과가 없습니다.")
+        st.subheader("✅ 담당자별 리서치 과제")
+        if st.button("과제 추출", key="btn_tasks"):
+            with st.spinner("생성 중..."):
+                st.session_state["tasks_result"] = extract_tasks(meeting1_text)
+        if "tasks_result" in st.session_state:
+            st.markdown(st.session_state["tasks_result"])
+        else:
+            st.info("아직 결과가 없습니다.")
 
-with tab3:
-    st.subheader("3. 리브랜딩 인사이트")
-
-    if st.button("리브랜딩 인사이트 생성", key="branding_btn"):
-        with st.spinner("리브랜딩 인사이트 생성 중..."):
-            st.session_state["branding_result"] = branding_insight(meeting1_text)
-
-    if "branding_result" in st.session_state:
-        st.markdown(st.session_state["branding_result"])
+# ── Tab 2: 리브랜딩 인사이트 ──
+with tabs[2]:
+    if not can_access(2):
+        show_access_denied(2)
     else:
-        st.info("아직 리브랜딩 인사이트 결과가 없습니다.")
+        st.subheader("💡 리브랜딩 인사이트")
+        if st.button("인사이트 생성", key="btn_branding"):
+            with st.spinner("생성 중..."):
+                st.session_state["branding_result"] = branding_insight(meeting1_text)
+        if "branding_result" in st.session_state:
+            st.markdown(st.session_state["branding_result"])
+        else:
+            st.info("아직 결과가 없습니다.")
 
-with tab4:
-    st.subheader("4. 숏폼 확산 전략")
-
-    if st.button("숏폼 전략 생성", key="shortform_btn"):
-        with st.spinner("숏폼 전략 생성 중..."):
-            st.session_state["shortform_result"] = shortform_strategy(meeting1_text)
-
-    if "shortform_result" in st.session_state:
-        st.markdown(st.session_state["shortform_result"])
+# ── Tab 3: 숏폼 전략 ──
+with tabs[3]:
+    if not can_access(3):
+        show_access_denied(3)
     else:
-        st.info("아직 숏폼 전략 결과가 없습니다.")
+        st.subheader("🎬 숏폼 확산 전략")
+        if st.button("전략 생성", key="btn_shortform"):
+            with st.spinner("생성 중..."):
+                st.session_state["shortform_result"] = shortform_strategy(meeting1_text)
+        if "shortform_result" in st.session_state:
+            st.markdown(st.session_state["shortform_result"])
+        else:
+            st.info("아직 결과가 없습니다.")
 
-with tab5:
-    st.subheader("5. 실행 계획 및 리스크")
-
-    if st.button("실행 계획·리스크 생성", key="action_risk_btn"):
-        with st.spinner("실행 계획 및 리스크 생성 중..."):
-            st.session_state["action_risk_result"] = action_and_risk(meeting1_text)
-
-    if "action_risk_result" in st.session_state:
-        st.markdown(st.session_state["action_risk_result"])
+# ── Tab 4: 실행 계획·리스크 ──
+with tabs[4]:
+    if not can_access(4):
+        show_access_denied(4)
     else:
-        st.info("아직 실행 계획 및 리스크 결과가 없습니다.")
+        st.subheader("⚙️ 실행 계획 및 리스크")
+        if st.button("생성", key="btn_action"):
+            with st.spinner("생성 중..."):
+                st.session_state["action_risk_result"] = action_and_risk(meeting1_text)
+        if "action_risk_result" in st.session_state:
+            st.markdown(st.session_state["action_risk_result"])
+        else:
+            st.info("아직 결과가 없습니다.")
 
-with tab6:
-    st.subheader("6. 전략 결정사항")
-
-    if st.button("결정사항 추출", key="decisions_btn"):
-        with st.spinner("결정사항 추출 중..."):
-            st.session_state["decisions_result"] = decisions(meeting1_text)
-
-    if "decisions_result" in st.session_state:
-        st.markdown(st.session_state["decisions_result"])
+# ── Tab 5: 결정사항 ──
+with tabs[5]:
+    if not can_access(5):
+        show_access_denied(5)
     else:
-        st.info("아직 결정사항 결과가 없습니다.")
+        st.subheader("🔒 전략 결정사항")
+        if st.button("추출", key="btn_decisions"):
+            with st.spinner("생성 중..."):
+                st.session_state["decisions_result"] = decisions(meeting1_text)
+        if "decisions_result" in st.session_state:
+            st.markdown(st.session_state["decisions_result"])
+        else:
+            st.info("아직 결과가 없습니다.")
 
-with tab7:
-    st.subheader("7. 에이블 Q&A")
-
-    question = st.text_input(
-        "에이블에게 질문하기",
-        value="리브랜딩을 위해 참고할 만한 글로벌 사례와 숏폼 챌린지 성공 공식은 뭐야?"
-    )
-
-    if st.button("질문하기", key="qa_btn"):
-        with st.spinner("에이블이 답변 생성 중..."):
-            st.session_state["qa_result"] = ask_able(
-                question=question,
-                reference_text=meeting1_text + "\n\n" + build_report_text(include_email=False)
-            )
-
-    if "qa_result" in st.session_state:
-        st.markdown(st.session_state["qa_result"])
+# ── Tab 6: Q&A ──
+with tabs[6]:
+    if not can_access(6):
+        show_access_denied(6)
     else:
-        st.info("아직 질의응답 결과가 없습니다.")
-
-with tab8:
-    st.subheader("8. 이메일 초안 생성 및 SendGrid 발송")
-
-    recipient_name = st.text_input("수신자명", value="팀장님")
-    recipient_email = st.text_input("수신자 이메일", value="")
-    sender_name = st.text_input("발신자명", value="에이블")
-
-    email_subject = st.text_input(
-        "이메일 제목",
-        value="[에이블 브리핑] Z세대 리브랜딩 및 숏폼 확산 전략 회의 정리"
-    )
-
-    if st.button("이메일 초안 생성", key="email_btn"):
-        with st.spinner("이메일 초안 생성 중..."):
-            st.session_state["email_draft_result"] = make_email_draft(
-                meeting1_text=meeting1_text,
-                recipient_name=recipient_name,
-                sender_name=sender_name
-            )
-
-    if "email_draft_result" in st.session_state:
-        email_body = st.text_area(
-            "이메일 본문",
-            value=st.session_state["email_draft_result"],
-            height=420
+        st.subheader("🤖 에이블 Q&A")
+        question = st.text_input(
+            "질문",
+            value="리브랜딩을 위해 참고할 만한 글로벌 사례와 숏폼 챌린지 성공 공식은?",
+            label_visibility="collapsed",
+            placeholder="에이블에게 질문하기"
         )
+        if st.button("질문하기", key="btn_qa"):
+            with st.spinner("답변 생성 중..."):
+                st.session_state["qa_result"] = ask_able(
+                    question=question,
+                    reference_text=meeting1_text + "\n\n" + build_report_text(include_email=False)
+                )
+        if "qa_result" in st.session_state:
+            st.markdown(st.session_state["qa_result"])
+        else:
+            st.info("아직 결과가 없습니다.")
 
-        col_email_1, col_email_2 = st.columns([1, 1])
-
-        with col_email_1:
-            st.download_button(
-                label="이메일 초안 TXT 다운로드",
-                data=email_body,
-                file_name="able_email_draft.txt",
-                mime="text/plain",
-                use_container_width=True
-            )
-
-        with col_email_2:
-            if st.button("SendGrid로 이메일 발송", use_container_width=True):
-                with st.spinner("이메일 발송 중..."):
-                    result = send_email(
-                        to=recipient_email,
-                        subject=email_subject,
-                        body=email_body
-                    )
-
-                if result["status"] == "success":
-                    st.success("이메일 발송 요청이 SendGrid에 접수되었습니다.")
-                else:
-                    st.error("이메일 발송 실패")
-                    st.json(result)
+# ── Tab 7: 이메일 ──
+with tabs[7]:
+    if not can_access(7):
+        show_access_denied(7)
     else:
-        st.info("아직 이메일 초안이 없습니다.")
+        st.subheader("📧 이메일 초안 생성 및 발송")
+        recipient_name  = st.text_input("수신자명",   value="팀장님")
+        recipient_email = st.text_input("수신자 이메일", value="")
+        sender_name     = st.text_input("발신자명",   value="에이블")
+        email_subject   = st.text_input("이메일 제목",
+            value="[에이블 브리핑] Z세대 리브랜딩 및 숏폼 확산 전략 회의 정리")
 
+        if st.button("이메일 초안 생성", key="btn_email"):
+            with st.spinner("초안 생성 중..."):
+                st.session_state["email_draft_result"] = make_email_draft(
+                    meeting1_text, recipient_name, sender_name
+                )
+
+        if "email_draft_result" in st.session_state:
+            email_body = st.text_area("이메일 본문",
+                value=st.session_state["email_draft_result"], height=400)
+            ec1, ec2 = st.columns(2)
+            with ec1:
+                st.download_button("⬇ 초안 TXT 다운로드", data=email_body,
+                    file_name="able_email_draft.txt", mime="text/plain", use_container_width=True)
+            with ec2:
+                if st.button("SendGrid 발송", use_container_width=True):
+                    with st.spinner("발송 중..."):
+                        result = send_email(recipient_email, email_subject, email_body)
+                    if result["status"] == "success":
+                        st.success("발송 완료")
+                    else:
+                        st.error("발송 실패")
+                        st.json(result)
+        else:
+            st.info("아직 이메일 초안이 없습니다.")
+
+# ══════════════════════════════════════════════════════════════
+# DOWNLOAD ALL
+# ══════════════════════════════════════════════════════════════
 st.divider()
 st.subheader("전체 결과 다운로드")
-
 final_report = build_report_text()
-
 if final_report.strip():
     st.download_button(
-        label="전체 분석 결과 Markdown 다운로드",
+        "⬇ 전체 분석 결과 Markdown 다운로드",
         data=final_report,
         file_name="able_project_report.md",
         mime="text/markdown",
