@@ -1,260 +1,140 @@
 # -*- coding: utf-8 -*-
-import os
+# pages/2_shortform.py  — 숏폼 스튜디오
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 import streamlit as st
-
-BASE_DIR = os.path.dirname(__file__)
-ABLE_IMAGE_PATH = os.path.join(BASE_DIR, "assets", "able_bunny.png")
-
-st.set_page_config(
-    page_title="에이블 | Z세대 리브랜딩 AI 비서",
-    page_icon="✨",
-    layout="wide",
-    initial_sidebar_state="collapsed",
+from shared import (
+    GLOBAL_CSS, ROLES,
+    render_sidebar,
+    shortform_strategy, generate_shortform_script, generate_ab_test, render_tts_control,
 )
 
+st.set_page_config(
+    page_title="에이블 · 숏폼 스튜디오",
+    page_icon="🎬",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+if not st.session_state.get("logged_in_user"):
+    st.switch_page("app.py")
+
+st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
+render_sidebar(current_page="2_shortform.py")
+
+user = st.session_state["logged_in_user"]
+meta = ROLES[user]
+color = meta["color"]
+access = meta.get("access", "full")
+
+# ── Access guard: only full / shortform roles ──
+if access == "strategy":
+    st.markdown(f"""
+    <div class="page-header">
+        <div class="page-title">숏폼 스튜디오</div>
+    </div>
+    <div style="background:#FFFFFF;border:1px dashed #D5C8EE;border-radius:14px;padding:3rem 2rem;text-align:center;margin-top:1rem;">
+        <div style="font-size:2.5rem;margin-bottom:0.7rem;">🔒</div>
+        <div style="color:#766D8A;font-size:0.9rem;font-weight:600;">이 페이지는 접근 권한이 없습니다.<br>담당자에게 문의해주세요.</div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.stop()
+
 # ══════════════════════════════════════════════════════════════
-# GLOBAL STYLE
+# PAGE HEADER
 # ══════════════════════════════════════════════════════════════
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Pretendard:wght@300;400;500;600;700&display=swap');
-
-/* hide default sidebar nav & hamburger on login */
-[data-testid="stSidebarNav"] { display: none !important; }
-[data-testid="collapsedControl"] { display: none !important; }
-section[data-testid="stSidebar"] { display: none !important; }
-#MainMenu { visibility: hidden; }
-footer { visibility: hidden; }
-header { visibility: hidden; height: 0 !important; }
-[data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], .stDeployButton { display: none !important; }
-[data-testid="stHeader"] { height: 0 !important; background: transparent !important; }
-
-html, body, [class*="css"] {
-    font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
-}
-.stApp {
-    background: #F7F4FF !important;
-    min-height: 100vh;
-}
-[data-testid="stAppViewContainer"] { background: #F7F4FF !important; }
-.block-container {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-    max-width: 100% !important;
-}
-
-/* ── LOGIN LAYOUT ── */
-.login-root {
-    min-height: auto;
-    padding: 0.15rem 1rem 0.1rem;
-}
-.login-shell {
-    width: 100%;
-    max-width: 1180px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(320px, 0.95fr) minmax(380px, 1.05fr);
-    gap: 1.35rem;
-    align-items: center;
-}
-.login-hero {
-    background: rgba(255,255,255,0.58);
-    border: 1px solid #DDD3F2;
-    border-radius: 24px;
-    padding: 0.55rem;
-    box-shadow: 0 18px 50px rgba(130,104,190,0.08);
-}
-.login-hero [data-testid="stImage"] img {
-    border-radius: 20px;
-    max-height: 520px;
-    object-fit: contain;
-}
-.login-card {
-    width: 100%;
-    max-width: 560px;
-}
-.login-logo {
-    text-align: center;
-    margin-bottom: 0.65rem;
-}
-.login-wordmark {
-    font-family: 'Syne', sans-serif;
-    font-size: 2.35rem;
-    font-weight: 800;
-    background: linear-gradient(120deg, #C4A8FF 0%, #E94C98 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.02em;
-    line-height: 1;
-}
-.login-sub {
-    font-size: 0.82rem;
-    color: #766D8A;
-    margin-top: 0.3rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-.login-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #6F6682;
-    margin-bottom: 0.45rem;
-}
-
-/* ── ROLE CARDS ── */
-.role-btn-wrap { margin-bottom: 0.55rem; }
-.role-visual {
-    background: #FFFFFF;
-    border: 1px solid #DDD3F2;
-    border-radius: 16px;
-    padding: 1.05rem 1.3rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: border-color 0.18s, transform 0.18s;
-    pointer-events: none;
-    margin-bottom: -0.1rem;
-}
-.role-visual:hover { border-color: #B49DFF; transform: translateY(-1px); }
-.role-avatar {
-    width: 46px; height: 46px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem; flex-shrink: 0;
-}
-.role-info { flex: 1; min-width: 0; }
-.role-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 1rem; font-weight: 700;
-    color: #211A32;
-}
-.role-desc { font-size: 0.75rem; color: #766D8A; margin-top: 2px; }
-.role-arrow { color: #8E84A6; font-size: 1rem; }
-
-/* Login page buttons — styled to look like the role card */
-.stButton > button {
-    background: transparent !important;
-    border: 1px solid #DDD3F2 !important;
-    border-radius: 16px !important;
-    color: #2E2940 !important;
-    font-family: 'Pretendard', sans-serif !important;
-    font-size: 0.92rem !important;
-    font-weight: 600 !important;
-    padding: 0.62rem 1rem !important;
-    width: 100% !important;
-    text-align: left !important;
-    transition: all 0.18s !important;
-    margin-bottom: 0.28rem !important;
-}
-.stButton > button:hover {
-    background: #F2ECFF !important;
-    border-color: #B49DFF !important;
-    transform: translateY(-1px) !important;
-}
-
-
-/* ── LIGHTER LOGIN READABILITY ── */
-.stMarkdown, .stMarkdown p, label { color: #2E2940 !important; }
-
-/* ── FOOTER ── */
-.login-footer {
-    text-align: center;
-    margin-top: 0.75rem;
-    font-size: 0.72rem;
-    color: #9B92AD;
-    letter-spacing: 0.05em;
-}
-@media (max-width: 920px) {
-    .login-shell { grid-template-columns: 1fr; gap: 0.75rem; }
-    .login-hero { display: none; }
-    .login-card { max-width: 560px; margin: 0 auto; }
-}
-@media (max-height: 760px) {
-    .login-hero [data-testid="stImage"] img { max-height: 455px; }
-    .login-wordmark { font-size: 2.15rem; }
-    .stButton > button { padding: 0.54rem 0.9rem !important; margin-bottom: 0.22rem !important; }
-    .login-footer { margin-top: 0.5rem; }
-}
-</style>
+st.markdown(f"""
+<div class="page-header">
+    <div class="page-title">숏폼 스튜디오</div>
+    <div class="page-subtitle" style="color:{color};">
+        {meta['emoji']} {user} · 숏폼 전략 · 스크립트 · A/B 테스트
+    </div>
+</div>
 """, unsafe_allow_html=True)
 
-# ══════════════════════════════════════════════════════════════
-# ROLE DEFINITIONS  (shared across pages via session_state)
-# ══════════════════════════════════════════════════════════════
-ROLES = {
-    "김부장": {
-        "title": "부장", "emoji": "🦁",
-        "color": "#3F7CF6", "bg": "#EAF1FF",
-        "desc": "전략 총괄 · 최종 결재",
-        "access": "full",          # full / strategy / shortform
-    },
-    "박팀장": {
-        "title": "팀장", "emoji": "🐯",
-        "color": "#F57935", "bg": "#FFF1E8",
-        "desc": "실행 총괄 · 팀 조율",
-        "access": "full",
-    },
-    "이과장": {
-        "title": "과장", "emoji": "🦊",
-        "color": "#7C5CFF", "bg": "#F1ECFF",
-        "desc": "퍼포먼스 마케팅 · 인플루언서",
-        "access": "strategy",
-    },
-    "김대리": {
-        "title": "대리", "emoji": "🐰",
-        "color": "#17A976", "bg": "#E9FFF6",
-        "desc": "브랜드 리서치 · 숏폼 콘텐츠",
-        "access": "full",
-    },
-}
+# ── Reference meeting text (read-only pull from session) ──
+meeting_text = st.session_state.get("meeting_text", "")
+if not meeting_text.strip():
+    st.warning("회의 분석 대시보드에서 회의록을 먼저 입력해주세요. 여기서 직접 입력하려면 아래 박스를 사용하세요.")
+
+with st.expander("📝 참고 회의록 (직접 입력 / 수정 가능)", expanded=not bool(meeting_text.strip())):
+    meeting_text = st.text_area(
+        "회의록",
+        value=meeting_text,
+        height=150,
+        label_visibility="collapsed",
+        key="sf_meeting_ref",
+        placeholder="숏폼 전략의 기반이 될 회의록을 입력하세요.",
+    )
+    if st.button("이 내용으로 저장", key="sf_save_ref"):
+        st.session_state["meeting_text"] = meeting_text
+        st.success("저장됐어요!")
+
+st.markdown("---")
 
 # ══════════════════════════════════════════════════════════════
-# REDIRECT IF ALREADY LOGGED IN
+# THREE TABS
 # ══════════════════════════════════════════════════════════════
-if st.session_state.get("logged_in_user"):
-    st.switch_page("pages/1_dashboard.py")
+tab_strategy, tab_script, tab_ab = st.tabs([
+    "🎬 숏폼 전략", "🎥 스크립트 생성", "🔀 A/B 테스트",
+])
 
-# ══════════════════════════════════════════════════════════════
-# LOGIN UI
-# ══════════════════════════════════════════════════════════════
-st.markdown('<div class="login-root"><div class="login-shell">', unsafe_allow_html=True)
+# ── 숏폼 전략 ──
+with tab_strategy:
+    st.markdown("#### 숏폼 확산 전략")
+    st.caption("회의 내용 기반으로 플랫폼별 전략, 챌린지 아이디어, 인플루언서 협업 방향을 도출합니다.")
 
-hero_col, login_col = st.columns([0.95, 1.05], gap="large")
-with hero_col:
-    st.markdown('<div class="login-hero">', unsafe_allow_html=True)
-    if os.path.exists(ABLE_IMAGE_PATH):
-        st.image(ABLE_IMAGE_PATH, use_container_width=True)
+    if st.button("전략 생성", key="btn_sf_strategy", use_container_width=False):
+        with st.spinner("전략 생성 중…"):
+            st.session_state["shortform_result"] = shortform_strategy(meeting_text)
+
+    if st.session_state.get("shortform_result"):
+        st.markdown(st.session_state["shortform_result"])
+        st.download_button("⬇ 전략 TXT 다운로드",
+            data=st.session_state["shortform_result"],
+            file_name="able_sf_strategy.txt", mime="text/plain")
+        render_tts_control(st.session_state["shortform_result"], "tts_sf_strategy")
     else:
-        st.markdown('<div style="padding:3rem;text-align:center;color:#766D8A;">에이블 이미지</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.info("전략 생성 버튼을 눌러주세요.")
 
-with login_col:
-    st.markdown('<div class="login-card">', unsafe_allow_html=True)
-    st.markdown("""
-    <div class="login-logo">
-        <div class="login-wordmark">에이블</div>
-        <div class="login-sub">Z세대 리브랜딩 전략 AI 비서</div>
-    </div>
-    <div class="login-label">담당자를 선택해 시작하세요</div>
-    """, unsafe_allow_html=True)
+# ── 스크립트 생성 ──
+with tab_script:
+    st.markdown("#### 60초 숏폼 스크립트")
+    st.caption("Hook → 전개 → CTA 구조로 실제 촬영 가능한 스크립트를 생성합니다.")
 
-    for name, meta in ROLES.items():
-        if st.button(
-            f"{meta['emoji']}  {name}  ·  {meta['title']} — {meta['desc']}",
-            key=f"login_{name}",
-            use_container_width=True,
-        ):
-            st.session_state["logged_in_user"] = name
-            st.session_state["role_meta"] = meta
-            st.session_state["ROLES"] = ROLES
-            if "tasks" not in st.session_state:
-                st.session_state["tasks"] = []
-            st.switch_page("pages/1_dashboard.py")
+    concept_hint = st.text_input(
+        "컨셉 힌트 (선택)",
+        placeholder="예: 브랜드 레거시를 반전시키는 챌린지, Z세대 감성으로 제품 재해석",
+        key="sf_concept",
+    )
+    if st.button("스크립트 생성", key="btn_sf_script", use_container_width=False):
+        with st.spinner("스크립트 생성 중…"):
+            st.session_state["script_result"] = generate_shortform_script(meeting_text, concept_hint)
 
-    st.markdown("""
-    <div class="login-footer">ABLE v6 · Anthropic Claude Powered</div>
-    </div>
-    """, unsafe_allow_html=True)
+    if st.session_state.get("script_result"):
+        st.markdown(st.session_state["script_result"])
+        st.download_button("⬇ 스크립트 TXT 다운로드",
+            data=st.session_state["script_result"],
+            file_name="able_script.txt", mime="text/plain")
+        render_tts_control(st.session_state["script_result"], "tts_sf_script")
+    else:
+        st.info("스크립트 생성 버튼을 눌러주세요.")
 
-st.markdown('</div></div>', unsafe_allow_html=True)
+# ── A/B 테스트 ──
+with tab_ab:
+    st.markdown("#### A/B 테스트 아이디어")
+    st.caption("숏폼 콘텐츠의 A/B 테스트 시나리오 3세트를 자동 생성합니다.")
+
+    if st.button("A/B 테스트 아이디어 생성", key="btn_ab", use_container_width=False):
+        with st.spinner("생성 중…"):
+            st.session_state["ab_result"] = generate_ab_test(meeting_text)
+
+    if st.session_state.get("ab_result"):
+        st.markdown(st.session_state["ab_result"])
+        st.download_button("⬇ A/B 아이디어 TXT 다운로드",
+            data=st.session_state["ab_result"],
+            file_name="able_ab.txt", mime="text/plain")
+        render_tts_control(st.session_state["ab_result"], "tts_sf_ab")
+    else:
+        st.info("생성 버튼을 눌러주세요.")
