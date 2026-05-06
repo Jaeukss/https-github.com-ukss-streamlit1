@@ -18,203 +18,209 @@ st.caption("APP VERSION: able-colab-streamlit-v3")
 # ══════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Syne:wght@700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap');
 
-html, body, [class*="css"] { font-family: 'DM Sans', sans-serif !important; }
+html, body, [class*="css"] { font-family: 'Nunito', sans-serif !important; }
 
+/* ── 전체 배경: 따뜻한 크림 ── */
 .stApp {
-    background: #F5F7FB;
-    color: #1a2340;
+    background: #FFF8F0;
+    color: #3d2f2f;
 }
-.main .block-container { padding-top: 2rem; max-width: 980px; }
+.main .block-container { padding-top: 1.5rem; max-width: 980px; }
 
-/* Title */
+/* ── 제목 ── */
 h1 {
-    font-family: 'Syne', sans-serif !important;
-    font-size: 2.5rem !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.025em !important;
-    background: linear-gradient(90deg, #2563EB 0%, #7C3AED 60%, #F4845F 100%);
+    font-family: 'Fredoka One', cursive !important;
+    font-size: 2.6rem !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.01em !important;
+    background: linear-gradient(90deg, #FF6B9D 0%, #A78BFA 55%, #60C8F5 100%);
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     margin-bottom: 0.1rem !important;
 }
 h2, h3 {
-    font-family: 'Syne', sans-serif !important;
-    font-weight: 700 !important;
-    color: #1e2d50 !important;
+    font-family: 'Nunito', sans-serif !important;
+    font-weight: 800 !important;
+    color: #3d2f2f !important;
 }
 
-/* Sidebar */
+/* ── 사이드바: 라벤더 파스텔 ── */
 section[data-testid="stSidebar"] {
-    background: #ffffff !important;
-    border-right: 1px solid #e2e8f4 !important;
+    background: #F3EEFF !important;
+    border-right: 2px solid #DDD0FF !important;
 }
+section[data-testid="stSidebar"] * { color: #3d2f2f !important; }
 
-/* Buttons */
+/* ── 버튼 ── */
 .stButton > button {
     background: #ffffff !important;
-    color: #2d4070 !important;
-    border: 1px solid #d0d8ee !important;
-    border-radius: 10px !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-weight: 500 !important;
-    transition: all 0.2s ease !important;
-    padding: 0.55rem 1.2rem !important;
+    color: #7C3AED !important;
+    border: 2px solid #DDD0FF !important;
+    border-radius: 14px !important;
+    font-family: 'Nunito', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    transition: all 0.18s ease !important;
+    padding: 0.5rem 1.1rem !important;
 }
 .stButton > button:hover {
-    background: #EEF3FF !important;
-    border-color: #2563EB !important;
-    color: #1a3a9e !important;
-    box-shadow: 0 2px 12px rgba(37,99,235,0.12) !important;
-    transform: translateY(-1px) !important;
+    background: #F3EEFF !important;
+    border-color: #A78BFA !important;
+    color: #5B21B6 !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 4px 14px rgba(167,139,250,0.25) !important;
 }
 
-/* Inputs */
+/* ── 입력창 ── */
 textarea, input[type="text"] {
     background: #ffffff !important;
-    color: #1a2340 !important;
-    border: 1px solid #d0d8ee !important;
-    border-radius: 10px !important;
-    font-family: 'DM Sans', sans-serif !important;
+    color: #3d2f2f !important;
+    border: 2px solid #DDD0FF !important;
+    border-radius: 14px !important;
+    font-family: 'Nunito', sans-serif !important;
+    font-size: 0.95rem !important;
 }
 textarea:focus, input[type="text"]:focus {
-    border-color: #2563EB !important;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
+    border-color: #A78BFA !important;
+    box-shadow: 0 0 0 3px rgba(167,139,250,0.18) !important;
 }
 
-/* Tabs */
+/* ── 탭 ── */
 .stTabs [data-baseweb="tab-list"] {
-    background: #edf0f8 !important;
-    border-radius: 12px !important;
+    background: #FFE8F5 !important;
+    border-radius: 16px !important;
     gap: 3px !important;
-    padding: 4px !important;
-    border: 1px solid #dce3f0 !important;
+    padding: 5px !important;
+    border: 2px solid #FFCCE8 !important;
 }
 .stTabs [data-baseweb="tab"] {
     background: transparent !important;
-    color: #7a8fbb !important;
-    border-radius: 8px !important;
-    font-family: 'DM Sans', sans-serif !important;
+    color: #C084A8 !important;
+    border-radius: 10px !important;
+    font-family: 'Nunito', sans-serif !important;
     font-size: 0.8rem !important;
-    font-weight: 500 !important;
+    font-weight: 700 !important;
     transition: all 0.18s !important;
 }
 .stTabs [aria-selected="true"] {
     background: #ffffff !important;
-    color: #2563EB !important;
-    border-bottom: 2px solid #2563EB !important;
-    box-shadow: 0 1px 4px rgba(37,99,235,0.1) !important;
+    color: #FF6B9D !important;
+    border-bottom: 3px solid #FF6B9D !important;
+    box-shadow: 0 2px 8px rgba(255,107,157,0.15) !important;
 }
 
-/* Divider */
-hr { border-color: #e2e8f4 !important; }
+/* ── 구분선 ── */
+hr { border-color: #FFDDF0 !important; }
 
-/* Expander */
-details summary { color: #7a8fbb !important; font-size: 0.88rem !important; }
+/* ── 익스팬더 ── */
+details summary { color: #C084A8 !important; font-size: 0.88rem !important; font-weight: 700 !important; }
 
-/* ── Login UI ──────────────────────────── */
+/* ════ 로그인 화면 ════ */
 .login-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 3rem 0 2rem;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 2.5rem 0 1.5rem;
+}
+.login-mascot {
+    font-size: 5rem;
+    margin-bottom: 0.5rem;
+    animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
 }
 .login-hero-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 3rem;
-    font-weight: 800;
-    background: linear-gradient(90deg, #4F8EF7 0%, #9B59F7 55%, #F4845F 100%);
+    font-family: 'Fredoka One', cursive;
+    font-size: 3.2rem;
+    font-weight: 400;
+    background: linear-gradient(90deg, #FF6B9D 0%, #A78BFA 55%, #60C8F5 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-align: center;
+    line-height: 1.1;
 }
 .login-hero-sub {
-    color: #3a4d6e;
-    font-size: 0.9rem;
-    letter-spacing: 0.06em;
+    color: #C084A8;
+    font-size: 0.92rem;
+    font-weight: 600;
     text-align: center;
-    margin-top: 0.5rem;
-    margin-bottom: 2.5rem;
+    margin-top: 0.4rem;
+    margin-bottom: 2rem;
 }
 .role-card {
-    background: linear-gradient(135deg, #101728 0%, #161f38 100%);
-    border: 1.5px solid #1e2a44;
-    border-radius: 16px;
-    padding: 1.1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 8px;
-    transition: all 0.22s ease;
+    background: #ffffff;
+    border: 2.5px solid #F0E0FF;
+    border-radius: 20px;
+    padding: 1rem 1.4rem;
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 10px rgba(167,139,250,0.08);
 }
-.role-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+.role-card:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 24px rgba(167,139,250,0.18);
 }
 .role-card .r-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #d8e4f5;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #3d2f2f;
 }
-.role-card .r-desc {
-    font-size: 0.76rem;
-    margin-top: 2px;
-}
+.role-card .r-desc { font-size: 0.75rem; margin-top: 2px; font-weight: 600; }
 .role-avatar {
-    width: 46px; height: 46px;
-    border-radius: 50%;
+    width: 52px; height: 52px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.25rem;
-    flex-shrink: 0;
+    font-size: 1.7rem; flex-shrink: 0;
 }
-.r-arrow { margin-left: auto; font-size: 1rem; opacity: 0.4; }
+.r-arrow { margin-left: auto; font-size: 1.2rem; opacity: 0.5; }
 
-/* ── Sidebar Badge ─────────────────────── */
+/* ════ 사이드바 배지 ════ */
 .user-badge {
-    border-radius: 12px;
+    border-radius: 18px;
     padding: 1rem 1.2rem;
     margin-bottom: 1rem;
-    position: relative;
-    overflow: hidden;
+    text-align: center;
 }
+.badge-mascot { font-size: 2.8rem; margin-bottom: 4px; }
 .badge-role {
-    font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
+    font-size: 0.68rem; font-weight: 800;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px;
 }
 .badge-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #d8e4f5;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem; font-weight: 400; color: #3d2f2f !important;
 }
-.badge-desc {
-    font-size: 0.74rem;
-    color: #3a4d6e;
-    margin-top: 2px;
-}
+.badge-desc { font-size: 0.74rem; font-weight: 600; margin-top: 3px; }
 
-/* ── Access Denied ─────────────────────── */
+.sidebar-menu-label {
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #C084A8 !important;
+    margin: 12px 0 6px;
+}
+.sidebar-menu-item {
+    font-size: 0.84rem; font-weight: 700; padding: 5px 8px;
+    border-radius: 10px; margin-bottom: 3px; color: #5d3f6a !important;
+    transition: background 0.15s;
+}
+.sidebar-menu-item:hover { background: #EDD9FF; }
+
+/* ════ 접근 불가 ════ */
 .access-denied {
-    background: #0d0f18;
-    border: 1px dashed #25183a;
-    border-radius: 14px;
+    background: linear-gradient(135deg, #FFF0FA, #F0EEFF);
+    border: 2px dashed #DDB9FF;
+    border-radius: 20px;
     padding: 3rem 2rem;
     text-align: center;
-    color: #3a2a55;
     margin-top: 1rem;
 }
-.access-denied .ad-icon { font-size: 2.2rem; margin-bottom: 0.8rem; }
-.access-denied .ad-title { color: #6a4888; font-size: 1rem; font-weight: 600; }
-.access-denied .ad-sub { margin-top: 0.5rem; font-size: 0.85rem; }
+.access-denied .ad-mascot { font-size: 3rem; margin-bottom: 0.5rem; }
+.access-denied .ad-title { color: #9B59F7; font-size: 1.1rem; font-weight: 800; }
+.access-denied .ad-sub { color: #B89CC8; margin-top: 0.5rem; font-size: 0.88rem; font-weight: 600; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -225,24 +231,32 @@ ROLES = {
     "김부장": {
         "title": "부장",
         "color": "#4F8EF7",
+        "pastel_bg": "#EBF3FF",
+        "mascot": "🦁",
         "description": "전략 총괄 · 최종 결재",
         "allowed_tabs": [0, 1, 2, 3, 4, 5, 6, 7],
     },
     "박팀장": {
         "title": "팀장",
-        "color": "#F4845F",
+        "color": "#FF8C69",
+        "pastel_bg": "#FFF0EB",
+        "mascot": "🐯",
         "description": "실행 총괄 · 팀 조율",
         "allowed_tabs": [0, 1, 2, 3, 4, 5, 6, 7],
     },
     "이과장": {
         "title": "과장",
-        "color": "#9B59F7",
+        "color": "#A78BFA",
+        "pastel_bg": "#F3EEFF",
+        "mascot": "🦊",
         "description": "퍼포먼스 마케팅 · 인플루언서",
         "allowed_tabs": [0, 1, 4, 6],
     },
     "김대리": {
         "title": "대리",
-        "color": "#2ECC8E",
+        "color": "#34C98E",
+        "pastel_bg": "#E8FBF4",
+        "mascot": "🐰",
         "description": "브랜드 리서치 · 숏폼 콘텐츠",
         "allowed_tabs": [0, 1, 2, 3, 6],
     },
@@ -316,29 +330,32 @@ DEFAULT_MEETING1_TEXT = """
 def show_login():
     st.markdown("""
     <div class="login-wrapper">
+        <div class="login-mascot">🧠✨</div>
         <div class="login-hero-title">에이블</div>
-        <div class="login-hero-sub">Z세대 리브랜딩 전략 AI 비서 &nbsp;·&nbsp; 담당자를 선택하세요</div>
+        <div class="login-hero-sub">Z세대 리브랜딩 전략 AI 비서 · 담당자를 선택해주세요 🎯</div>
     </div>
     """, unsafe_allow_html=True)
 
     col = st.columns([1, 2, 1])[1]
     with col:
         for name, meta in ROLES.items():
-            color = meta["color"]
+            color      = meta["color"]
+            pastel_bg  = meta["pastel_bg"]
+            mascot     = meta["mascot"]
             st.markdown(f"""
-            <div class="role-card" style="border-color:{color}33;">
-                <div class="role-avatar" style="background:{color}18; border:1.5px solid {color}44;">
-                    👤
+            <div class="role-card" style="border-color:{color}55;">
+                <div class="role-avatar" style="background:{pastel_bg}; font-size:1.9rem;">
+                    {mascot}
                 </div>
                 <div>
                     <div class="r-name">{name}</div>
-                    <div class="r-desc" style="color:{color}99;">{meta['title']} · {meta['description']}</div>
+                    <div class="r-desc" style="color:{color};">{meta['title']} · {meta['description']}</div>
                 </div>
                 <div class="r-arrow" style="color:{color};">→</div>
             </div>
             """, unsafe_allow_html=True)
 
-            if st.button(f"  {name} 으로 시작하기  ", key=f"login_{name}", use_container_width=True):
+            if st.button(f"{mascot}  {name} 으로 시작하기", key=f"login_{name}", use_container_width=True):
                 st.session_state["logged_in_user"] = name
                 st.rerun()
 
@@ -349,30 +366,33 @@ def render_sidebar():
     user = st.session_state.get("logged_in_user")
     if not user:
         return
-    meta  = ROLES[user]
-    color = meta["color"]
+    meta       = ROLES[user]
+    color      = meta["color"]
+    pastel_bg  = meta["pastel_bg"]
+    mascot     = meta["mascot"]
 
     with st.sidebar:
         st.markdown(f"""
-        <div class="user-badge" style="background:linear-gradient(135deg,#0d1220,#131d38);
-             border:1.5px solid {color}33;">
+        <div class="user-badge" style="background:{pastel_bg}; border:2px solid {color}44;">
+            <div class="badge-mascot">{mascot}</div>
             <div class="badge-role" style="color:{color};">접속 중</div>
             <div class="badge-name">{user}</div>
-            <div class="badge-desc">{meta['title']} · {meta['description']}</div>
+            <div class="badge-desc" style="color:{color};">{meta['title']} · {meta['description']}</div>
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("⇠  로그아웃", use_container_width=True):
+        if st.button("👋  로그아웃", use_container_width=True):
             st.session_state.pop("logged_in_user", None)
             st.rerun()
 
-        st.markdown("---")
-        st.markdown(f"<div style='font-size:0.7rem;color:#2a3a58;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;'>접근 가능 메뉴</div>", unsafe_allow_html=True)
+        st.markdown("<div class='sidebar-menu-label'>접근 가능 메뉴</div>", unsafe_allow_html=True)
         for i in meta["allowed_tabs"]:
             icon, label = TAB_LABELS[i]
-            st.markdown(f"<div style='font-size:0.82rem;color:#4a6090;padding:3px 0;'>"
-                        f"<span style='color:{color};margin-right:6px;'>▸</span>{icon} {label}</div>",
-                        unsafe_allow_html=True)
+            st.markdown(
+                f"<div class='sidebar-menu-item'>"
+                f"<span style='margin-right:6px;'>{icon}</span>{label}</div>",
+                unsafe_allow_html=True
+            )
 
 # ══════════════════════════════════════════════════════════════
 # ACCESS GUARD
@@ -387,9 +407,9 @@ def show_access_denied(tab_index: int):
     _, label = TAB_LABELS[tab_index]
     st.markdown(f"""
     <div class="access-denied">
-        <div class="ad-icon">🔒</div>
-        <div class="ad-title">{label}</div>
-        <div class="ad-sub">현재 계정의 접근 권한이 없는 메뉴입니다.</div>
+        <div class="ad-mascot">🔒🙈</div>
+        <div class="ad-title">{label} 메뉴는 열쇠가 필요해요!</div>
+        <div class="ad-sub">현재 계정의 접근 권한이 없는 메뉴입니다.<br>담당자에게 문의해주세요 🌸</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -526,11 +546,11 @@ user      = st.session_state["logged_in_user"]
 user_meta = ROLES[user]
 color     = user_meta["color"]
 
-st.title("에이블")
+st.title("에이블 ✨")
 st.markdown(
-    f"<span style='color:{color};font-size:0.85rem;font-weight:500;'>"
-    f"👤 {user} ({user_meta['title']})</span>"
-    f"<span style='color:#2a3a58;font-size:0.85rem;'> · Z세대 리브랜딩 전략 AI 비서</span>",
+    f"<span style='color:{color};font-size:0.9rem;font-weight:700;'>"
+    f"{user_meta['mascot']} {user} ({user_meta['title']})</span>"
+    f"<span style='color:#C084A8;font-size:0.9rem;font-weight:600;'> · Z세대 리브랜딩 전략 AI 비서 🎯</span>",
     unsafe_allow_html=True
 )
 
