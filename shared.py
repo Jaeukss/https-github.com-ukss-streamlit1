@@ -13,25 +13,25 @@ from openai import OpenAI
 ROLES = {
     "김부장": {
         "title": "부장", "emoji": "🦁",
-        "color": "#6C9EFF", "bg": "#0E1628",
+        "color": "#3F7CF6", "bg": "#EAF1FF",
         "desc": "전략 총괄 · 최종 결재",
         "access": "full",
     },
     "박팀장": {
         "title": "팀장", "emoji": "🐯",
-        "color": "#FF9F6B", "bg": "#1A120C",
+        "color": "#F57935", "bg": "#FFF1E8",
         "desc": "실행 총괄 · 팀 조율",
         "access": "full",
     },
     "이과장": {
         "title": "과장", "emoji": "🦊",
-        "color": "#BFA8FF", "bg": "#110E1E",
+        "color": "#7C5CFF", "bg": "#F1ECFF",
         "desc": "퍼포먼스 마케팅 · 인플루언서",
         "access": "strategy",
     },
     "김대리": {
         "title": "대리", "emoji": "🐰",
-        "color": "#5ADBA9", "bg": "#091A13",
+        "color": "#17A976", "bg": "#E9FFF6",
         "desc": "브랜드 리서치 · 숏폼 콘텐츠",
         "access": "shortform",
     },
@@ -251,39 +251,40 @@ GLOBAL_CSS = """
 html, body, [class*="css"] {
     font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
 }
-.stApp { background: #0B0B13 !important; }
+.stApp { background: #F7F4FF !important; }
+[data-testid="stAppViewContainer"] { background: #F7F4FF !important; }
 
 /* ── NAV SIDEBAR ── */
 [data-testid="stSidebarNav"] { display: none !important; }
 section[data-testid="stSidebar"] {
-    background: #0F0E18 !important;
-    border-right: 1px solid #1E1C2E !important;
+    background: #FFFFFF !important;
+    border-right: 1px solid #E5DDF7 !important;
     min-width: 220px !important;
 }
-section[data-testid="stSidebar"] * { color: #C5C0DA !important; }
+section[data-testid="stSidebar"] * { color: #2E2940 !important; }
 
 .sb-profile {
-    background: #13121E; border: 1px solid #23213A;
+    background: #FFFFFF; border: 1px solid #DDD3F2;
     border-radius: 14px; padding: 1rem 1.1rem;
     text-align: center; margin-bottom: 1.2rem;
 }
 .sb-emoji { font-size: 2.2rem; margin-bottom: 0.3rem; }
-.sb-name { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; color: #E8E5F5 !important; }
-.sb-role { font-size: 0.72rem; color: #5A5775 !important; margin-top: 2px; letter-spacing: 0.06em; }
+.sb-name { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; color: #211A32 !important; }
+.sb-role { font-size: 0.72rem; color: #7C738F !important; margin-top: 2px; letter-spacing: 0.06em; }
 
 .sb-section { font-size: 0.63rem; font-weight: 600; letter-spacing: 0.12em;
-    text-transform: uppercase; color: #35334D !important; margin: 1.2rem 0 0.5rem; }
+    text-transform: uppercase; color: #8F86A3 !important; margin: 1.2rem 0 0.5rem; }
 
 .nav-item {
     display: flex; align-items: center; gap: 0.6rem;
     padding: 0.52rem 0.8rem; border-radius: 10px;
     font-size: 0.84rem; font-weight: 500;
-    color: #7A7590 !important; margin-bottom: 2px;
+    color: #5F5671 !important; margin-bottom: 2px;
     transition: background 0.15s;
     text-decoration: none;
 }
-.nav-item:hover { background: #1A182A !important; color: #C5C0DA !important; }
-.nav-item.active { background: #1E1C30 !important; color: #BFA8FF !important; }
+.nav-item:hover { background: #F1ECFF !important; color: #2E2940 !important; }
+.nav-item.active { background: #EEE7FF !important; color: #7C5CFF !important; }
 .nav-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
 /* ── PAGE COMMON ── */
@@ -292,20 +293,20 @@ section[data-testid="stSidebar"] * { color: #C5C0DA !important; }
 .page-header {
     margin-bottom: 2rem;
     padding-bottom: 1.2rem;
-    border-bottom: 1px solid #1A1828;
+    border-bottom: 1px solid #E6DDF7;
 }
 .page-title {
     font-family: 'Syne', sans-serif;
     font-size: 1.8rem; font-weight: 800;
-    color: #E8E5F5;
+    color: #211A32;
     letter-spacing: -0.02em;
     margin: 0 0 0.25rem;
 }
-.page-subtitle { font-size: 0.83rem; color: #4E4B63; margin: 0; }
+.page-subtitle { font-size: 0.83rem; color: #6F6682; margin: 0; }
 
 /* ── CARDS ── */
 .card {
-    background: #13121E; border: 1px solid #1E1C2E;
+    background: #FFFFFF; border: 1px solid #E5DDF7;
     border-radius: 14px; padding: 1.2rem 1.4rem;
     margin-bottom: 1rem;
 }
@@ -313,31 +314,31 @@ section[data-testid="stSidebar"] * { color: #C5C0DA !important; }
     font-family: 'Syne', sans-serif;
     font-size: 0.78rem; font-weight: 700;
     letter-spacing: 0.1em; text-transform: uppercase;
-    color: #4E4B63; margin-bottom: 0.7rem;
+    color: #6F6682; margin-bottom: 0.7rem;
 }
 
 /* ── INPUT OVERRIDES ── */
 textarea, input[type="text"], .stTextInput input, .stTextArea textarea {
-    background: #13121E !important; color: #C5C0DA !important;
-    border: 1px solid #1E1C2E !important; border-radius: 10px !important;
+    background: #FFFFFF !important; color: #2E2940 !important;
+    border: 1px solid #E5DDF7 !important; border-radius: 10px !important;
 }
 textarea:focus, input:focus {
-    border-color: #3D3568 !important;
+    border-color: #9A80FF !important;
     box-shadow: 0 0 0 3px rgba(99,85,180,0.12) !important;
 }
-.stSelectbox > div { background: #13121E !important; border: 1px solid #1E1C2E !important; border-radius: 10px !important; }
+.stSelectbox > div { background: #FFFFFF !important; border: 1px solid #E5DDF7 !important; border-radius: 10px !important; }
 
 /* ── BUTTONS ── */
 .stButton > button {
-    background: #1A182A !important; color: #BFA8FF !important;
-    border: 1px solid #2E2B48 !important; border-radius: 10px !important;
+    background: #F1ECFF !important; color: #7C5CFF !important;
+    border: 1px solid #D5C8EE !important; border-radius: 10px !important;
     font-family: 'Pretendard', sans-serif !important;
     font-size: 0.85rem !important; font-weight: 600 !important;
     padding: 0.5rem 1.1rem !important;
     transition: all 0.15s !important;
 }
 .stButton > button:hover {
-    background: #221F38 !important; border-color: #4A4270 !important;
+    background: #E9E0FF !important; border-color: #B49DFF !important;
     transform: translateY(-1px) !important;
 }
 
@@ -359,52 +360,70 @@ section[data-testid="stSidebar"] .stButton > button {
 
 /* Primary button variant */
 .btn-primary > button {
-    background: linear-gradient(120deg, #3D2E7C 0%, #6B3D6E 100%) !important;
-    color: #EEE8FF !important; border: none !important;
+    background: linear-gradient(120deg, #8B6CFF 0%, #6B3D6E 100%) !important;
+    color: #FFFFFF !important; border: none !important;
 }
 .btn-primary > button:hover {
-    background: linear-gradient(120deg, #4E3D99 0%, #7D4880 100%) !important;
+    background: linear-gradient(120deg, #7C5CFF 0%, #7D4880 100%) !important;
 }
 
 /* ── TABS ── */
 .stTabs [data-baseweb="tab-list"] {
-    background: #13121E !important; border-radius: 12px !important;
+    background: #FFFFFF !important; border-radius: 12px !important;
     gap: 2px !important; padding: 4px !important;
-    border: 1px solid #1E1C2E !important;
+    border: 1px solid #E5DDF7 !important;
 }
 .stTabs [data-baseweb="tab"] {
-    background: transparent !important; color: #4E4B63 !important;
+    background: transparent !important; color: #6F6682 !important;
     border-radius: 8px !important; font-size: 0.82rem !important;
     font-weight: 600 !important; padding: 0.45rem 0.9rem !important;
 }
 .stTabs [aria-selected="true"] {
-    background: #1E1C30 !important; color: #BFA8FF !important;
+    background: #EEE7FF !important; color: #7C5CFF !important;
+}
+
+
+/* ── LIGHTER GLOBAL READABILITY ── */
+.stMarkdown, .stMarkdown p, .stMarkdown li, .stCaption, label, .stRadio label, .stSelectbox label {
+    color: #2E2940 !important;
+}
+[data-testid="stDataFrame"], [data-testid="stDataEditor"] {
+    background: #FFFFFF !important;
+    border-radius: 12px !important;
+}
+[data-testid="stMetric"] {
+    background: #FFFFFF !important;
+}
+.stAlert {
+    background: #FFFFFF !important;
+    color: #2E2940 !important;
+    border: 1px solid #E5DDF7 !important;
 }
 
 /* ── MISC ── */
-hr { border-color: #1A1828 !important; }
+hr { border-color: #E6DDF7 !important; }
 .stSuccess, .stInfo, .stWarning { border-radius: 10px !important; }
-.stSpinner > div { border-color: #BFA8FF !important; }
+.stSpinner > div { border-color: #7C5CFF !important; }
 
 /* keyword tags */
 .kw-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin: 0.6rem 0; }
 .kw-tag {
-    background: #1A182A; border: 1px solid #2E2B48;
+    background: #F1ECFF; border: 1px solid #D5C8EE;
     border-radius: 20px; padding: 3px 12px;
-    font-size: 0.76rem; font-weight: 600; color: #BFA8FF;
+    font-size: 0.76rem; font-weight: 600; color: #7C5CFF;
 }
 
 /* notify / news cards */
-.n-card { background: #0F0E18; border: 1px solid #1E1C2E; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.7rem; }
-.n-card-title { font-size: 0.85rem; font-weight: 700; color: #FF8ABD; margin-bottom: 0.4rem; }
-.n-card-body { font-size: 0.82rem; color: #7A7590; line-height: 1.65; }
-.news-source { font-size: 0.7rem; color: #4E4B63; font-weight: 600; margin-bottom: 0.3rem; }
-.news-title { font-size: 0.92rem; font-weight: 700; color: #C5C0DA; margin-bottom: 0.4rem; }
-.news-body { font-size: 0.8rem; color: #6B6680; line-height: 1.6; }
+.n-card { background: #FFFFFF; border: 1px solid #E5DDF7; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.7rem; }
+.n-card-title { font-size: 0.85rem; font-weight: 700; color: #E94C98; margin-bottom: 0.4rem; }
+.n-card-body { font-size: 0.82rem; color: #5F5671; line-height: 1.65; }
+.news-source { font-size: 0.7rem; color: #6F6682; font-weight: 600; margin-bottom: 0.3rem; }
+.news-title { font-size: 0.92rem; font-weight: 700; color: #2E2940; margin-bottom: 0.4rem; }
+.news-body { font-size: 0.8rem; color: #766D8A; line-height: 1.6; }
 
 /* progress bar */
-.prog-wrap { background: #1A182A; border-radius: 6px; height: 8px; overflow: hidden; margin: 6px 0 14px; }
-.prog-fill { background: linear-gradient(90deg, #BFA8FF, #FF8ABD); height: 100%; border-radius: 6px; transition: width 0.4s; }
+.prog-wrap { background: #F1ECFF; border-radius: 6px; height: 8px; overflow: hidden; margin: 6px 0 14px; }
+.prog-fill { background: linear-gradient(90deg, #7C5CFF, #E94C98); height: 100%; border-radius: 6px; transition: width 0.4s; }
 </style>
 """
 
@@ -414,7 +433,7 @@ def render_sidebar(current_page: str = ""):
         st.switch_page("app.py")
         return
     meta = ROLES.get(user, {})
-    color = meta.get("color", "#BFA8FF")
+    color = meta.get("color", "#7C5CFF")
 
     with st.sidebar:
         st.markdown(f"""
@@ -435,7 +454,7 @@ def render_sidebar(current_page: str = ""):
         for page_file, icon, label in pages:
             is_active = current_page == page_file
             cls = "nav-item active" if is_active else "nav-item"
-            dot_color = color if is_active else "#2E2B48"
+            dot_color = color if is_active else "#D5C8EE"
             st.markdown(
                 f'<div class="{cls}">'
                 f'<span class="nav-dot" style="background:{dot_color};"></span>'
@@ -452,12 +471,12 @@ def render_sidebar(current_page: str = ""):
             for i, snap in enumerate(reversed(history[-3:])):
                 preview = snap["text"][:35].replace("\n", " ") + "…"
                 st.markdown(
-                    f'<div style="font-size:0.75rem;color:#4E4B63;padding:4px 8px;margin-bottom:3px;">'
-                    f'<span style="color:#3D3568;">#{len(history)-i}</span> {preview}</div>',
+                    f'<div style="font-size:0.75rem;color:#6F6682;padding:4px 8px;margin-bottom:3px;">'
+                    f'<span style="color:#9A80FF;">#{len(history)-i}</span> {preview}</div>',
                     unsafe_allow_html=True,
                 )
         else:
-            st.markdown('<div style="font-size:0.75rem;color:#2E2B48;padding:4px 8px;">저장된 히스토리 없음</div>', unsafe_allow_html=True)
+            st.markdown('<div style="font-size:0.75rem;color:#D5C8EE;padding:4px 8px;">저장된 히스토리 없음</div>', unsafe_allow_html=True)
 
         st.markdown("---")
         if st.button("👋 로그아웃", use_container_width=True):

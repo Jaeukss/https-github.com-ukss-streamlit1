@@ -1,0 +1,380 @@
+# -*- coding: utf-8 -*-
+# pages/1_dashboard.py  — 회의 분석 대시보드
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+import re
+import requests
+import streamlit as st
+from datetime import datetime
+from shared import (
+    GLOBAL_CSS, ROLES, DEFAULT_MEETING_TEXT, OPENAI_API_KEY, SENDGRID_API_KEY, EMAIL_ADDRESS,
+    render_sidebar, clear_results, extract_keywords, summarize_meeting, extract_tasks_ai,
+    branding_insight, action_and_risk, decisions, ask_able, generate_notify_messages,
+    make_email_draft, compare_meetings, extract_tasks_structured, add_tasks_to_state,
+    RESULT_KEYS,
+)
+
+st.set_page_config(
+    page_title="에이블 · 회의 분석",
+    page_icon="📋",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# ── Auth guard ──
+if not st.session_state.get("logged_in_user"):
+    st.switch_page("app.py")
+
+st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
+render_sidebar(current_page="1_dashboard.py")
+
+user = st.session_state["logged_in_user"]
+meta = ROLES[user]
+color = meta["color"]
+
+# ══════════════════════════════════════════════════════════════
+# PAGE HEADER
+# ══════════════════════════════════════════════════════════════
+st.markdown(f"""
+<div class="page-header">
+    <div class="page-title">회의 분석 대시보드</div>
+    <div class="page-subtitle" style="color:{color};">
+        {meta['emoji']} {user} ({meta['title']}) · Z세대 리브랜딩 전략 AI 비서
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════
+# MEETING INPUT SECTION
+# ══════════════════════════════════════════════════════════════
+with st.container():
+    st.markdown('<div class="card"><div class="card-title">회의록 입력</div>', unsafe_allow_html=True)
+
+    if "meeting_text" not in st.session_state:
+        st.session_state["meeting_text"] = DEFAULT_MEETING_TEXT
+
+    # File upload
+    uploaded_file = st.file_uploader("파일 업로드 (txt / md)", type=["txt", "md"], label_visibility="collapsed")
+    if uploaded_file:
+        text_from_file = uploaded_file.read().decode("utf-8")
+        if st.session_state.get("last_uploaded") != uploaded_file.name:
+            st.session_state["meeting_text"] = text_from_file
+            st.session_state["last_uploaded"] = uploaded_file.name
+            clear_results()
+            st.rerun()
+
+    col_ex, col_clear = st.columns([1, 1])
+    with col_ex:
+        if st.button("예시 회의록 불러오기", use_container_width=True):
+            st.session_state["meeting_text"] = DEFAULT_MEETING_TEXT
+            clear_results()
+            st.rerun()
+    with col_clear:
+        if st.button("입력창 비우기", use_container_width=True):
+            st.session_state["meeting_text"] = ""
+            clear_results()
+            st.rerun()
+
+    meeting_text = st.text_area(
+        "회의록",
+        key="meeting_text",
+        height=180,
+        placeholder="회의록 내용을 붙여넣거나 위에서 파일을 업로드하세요.",
+        label_visibility="collapsed",
+    )
+    st.markdown(f'<div style="font-size:0.72rem;color:#35334D;margin-top:4px;">{len(meeting_text):,}자</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ── Keyword row ──
+kw_col, kw_btn_col = st.columns([5, 1])
+with kw_btn_col:
+    if st.button("🏷️ 키워드 추출", use_container_width=True):
+        with st.spinner("키워드 추출 중..."):
+            st.session_state["keywords_result"] = extract_keywords(meeting_text)
+
+if st.session_state.get("keywords_result"):
+    tags_html = "".join([f'<span class="kw-tag"># {kw}</span>' for kw in st.session_state["keywords_result"]])
+    st.markdown(f'<div class="kw-wrap">{tags_html}</div>', unsafe_allow_html=True)
+
+# ── Run all / Reset ──
+run_col, length_col, reset_col = st.columns([3, 2, 1])
+with length_col:
+    length_opt = st.selectbox("요약 길이", ["보통", "짧게", "자세히"], label_visibility="collapsed")
+with run_col:
+    st.markdown('<div class="btn-primary">', unsafe_allow_html=True)
+    run_all = st.button("⚡ 전체 분석 실행", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+with reset_col:
+    if st.button("↺ 초기화", use_container_width=True):
+        clear_results()
+        st.rerun()
+
+if run_all:
+    with st.spinner("에이블이 분석 중입니다…"):
+        st.session_state["summary_result"]     = summarize_meeting(meeting_text, length_opt)
+        st.session_state["tasks_result"]       = extract_tasks_ai(meeting_text)
+        st.session_state["branding_result"]    = branding_insight(meeting_text)
+        st.session_state["action_risk_result"] = action_and_risk(meeting_text)
+        st.session_state["decisions_result"]   = decisions(meeting_text)
+        # Also push tasks to dashboard
+        extracted = extract_tasks_structured(meeting_text)
+        if extracted:
+            add_tasks_to_state(extracted)
+    st.success(f"분석 완료! 업무 {len(extracted) if extracted else 0}개가 업무 대시보드에도 반영됐어요.")
+
+# ── Snapshot / Compare ──
+snap_col, cmp_col = st.columns(2)
+with snap_col:
+    if st.button("💾 스냅샷 저장", use_container_width=True):
+        if "history" not in st.session_state:
+            st.session_state["history"] = []
+        st.session_state["history"].append({
+            "saved_at": datetime.now().strftime("%m/%d %H:%M"),
+            "text": meeting_text,
+            "results": {k: st.session_state.get(k, "") for k in RESULT_KEYS},
+        })
+        st.success(f"스냅샷 #{len(st.session_state['history'])} 저장 완료!")
+
+history = st.session_state.get("history", [])
+with cmp_col:
+    if len(history) >= 1:
+        snap_opts = [f"#{i+1} · {s['saved_at']}" for i, s in enumerate(history)]
+        sel = st.selectbox("비교할 스냅샷", snap_opts, label_visibility="collapsed")
+        if st.button("🔍 이전 회의 대비 변화 분석", use_container_width=True):
+            idx = snap_opts.index(sel)
+            with st.spinner("변화 분석 중..."):
+                st.session_state["compare_result"] = compare_meetings(history[idx]["text"], meeting_text)
+    else:
+        st.caption("스냅샷을 먼저 저장하면 회의 간 비교가 가능해요.")
+
+if st.session_state.get("compare_result"):
+    with st.expander("📊 이전 회의 대비 변화 분석", expanded=True):
+        st.markdown(st.session_state["compare_result"])
+
+st.markdown("---")
+
+# ══════════════════════════════════════════════════════════════
+# RESULT TABS
+# ══════════════════════════════════════════════════════════════
+access = meta.get("access", "full")
+
+# Decide which tabs are visible
+all_tabs = ["📋 회의 요약", "✅ 담당자 과제", "💡 리브랜딩 인사이트", "⚙️ 실행·리스크", "🔒 결정사항", "🤖 에이블 Q&A", "📧 이메일", "🔔 알림 메시지"]
+tab_access = {
+    "full":      [0, 1, 2, 3, 4, 5, 6, 7],
+    "strategy":  [0, 1, 3, 4, 5, 7],
+    "shortform": [0, 1, 2, 5],
+}
+allowed = tab_access.get(access, [0, 1, 2, 3, 4, 5, 6, 7])
+visible_tabs = [(i, label) for i, label in enumerate(all_tabs) if i in allowed]
+
+tab_objects = st.tabs([label for _, label in visible_tabs])
+
+def tab_for(index):
+    """Return tab object matching original tab index, or None."""
+    for pos, (orig_i, _) in enumerate(visible_tabs):
+        if orig_i == index:
+            return tab_objects[pos]
+    return None
+
+# ── 0: 회의 요약 ──
+t = tab_for(0)
+if t:
+    with t:
+        col_l, col_r = st.columns([3, 1])
+        with col_r:
+            sum_len = st.selectbox("길이", ["보통", "짧게", "자세히"], key="sum_len_tab")
+        with col_l:
+            if st.button("요약 생성", key="btn_summary"):
+                with st.spinner("생성 중..."):
+                    st.session_state["summary_result"] = summarize_meeting(meeting_text, sum_len)
+        if st.session_state.get("summary_result"):
+            st.markdown(st.session_state["summary_result"])
+        else:
+            st.info("⚡ 전체 분석 실행 또는 요약 생성 버튼을 눌러주세요.")
+
+# ── 1: 담당자 과제 ──
+t = tab_for(1)
+if t:
+    with t:
+        view_mode = st.radio("보기 모드", ["📊 표 보기", "☑️ 체크리스트"], horizontal=True)
+        if st.button("과제 추출", key="btn_tasks"):
+            with st.spinner("생성 중..."):
+                st.session_state["tasks_result"] = extract_tasks_ai(meeting_text)
+                st.session_state.pop("todo_checks", None)
+        if st.session_state.get("tasks_result"):
+            if view_mode == "📊 표 보기":
+                st.markdown(st.session_state["tasks_result"])
+            else:
+                # parse to checklist
+                rows = []
+                lines = st.session_state["tasks_result"].strip().split("\n")
+                header_passed = False
+                for line in lines:
+                    if not line.startswith("|"): continue
+                    cells = [c.strip() for c in line.strip("|").split("|")]
+                    if "---" in cells[0]: header_passed = True; continue
+                    if not header_passed: continue
+                    if len(cells) >= 2 and cells[0] and cells[1]:
+                        rows.append({"담당자": cells[0], "업무": cells[1],
+                            "마감일": cells[3] if len(cells) > 3 else "-",
+                            "우선순위": cells[4] if len(cells) > 4 else "-"})
+                if not rows:
+                    st.markdown(st.session_state["tasks_result"])
+                else:
+                    if "todo_checks" not in st.session_state:
+                        st.session_state["todo_checks"] = {i: False for i in range(len(rows))}
+                    done = sum(st.session_state["todo_checks"].values())
+                    pct = int(done / len(rows) * 100) if rows else 0
+                    st.markdown(f"**완료율 {done}/{len(rows)} ({pct}%)**")
+                    st.markdown(f'<div class="prog-wrap"><div class="prog-fill" style="width:{pct}%;"></div></div>', unsafe_allow_html=True)
+                    by_person = {}
+                    for i, row in enumerate(rows):
+                        by_person.setdefault(row["담당자"], []).append((i, row))
+                    for person, items in by_person.items():
+                        p_done = sum(st.session_state["todo_checks"].get(i, False) for i, _ in items)
+                        st.markdown(f"**{person}** ({p_done}/{len(items)})")
+                        for idx, row in items:
+                            checked = st.checkbox(
+                                f"{row['업무']}  ·  마감: {row['마감일']}  ·  우선순위: {row['우선순위']}",
+                                value=st.session_state["todo_checks"].get(idx, False),
+                                key=f"todo_{idx}"
+                            )
+                            st.session_state["todo_checks"][idx] = checked
+        else:
+            st.info("과제 추출 버튼을 눌러주세요.")
+
+# ── 2: 리브랜딩 인사이트 ──
+t = tab_for(2)
+if t:
+    with t:
+        if st.button("인사이트 생성", key="btn_branding"):
+            with st.spinner("생성 중..."):
+                st.session_state["branding_result"] = branding_insight(meeting_text)
+        if st.session_state.get("branding_result"):
+            st.markdown(st.session_state["branding_result"])
+        else:
+            st.info("인사이트 생성 버튼을 눌러주세요.")
+
+# ── 3: 실행·리스크 ──
+t = tab_for(3)
+if t:
+    with t:
+        if st.button("생성", key="btn_action"):
+            with st.spinner("생성 중..."):
+                st.session_state["action_risk_result"] = action_and_risk(meeting_text)
+        if st.session_state.get("action_risk_result"):
+            st.markdown(st.session_state["action_risk_result"])
+        else:
+            st.info("생성 버튼을 눌러주세요.")
+
+# ── 4: 결정사항 ──
+t = tab_for(4)
+if t:
+    with t:
+        if st.button("추출", key="btn_decisions"):
+            with st.spinner("생성 중..."):
+                st.session_state["decisions_result"] = decisions(meeting_text)
+        if st.session_state.get("decisions_result"):
+            st.markdown(st.session_state["decisions_result"])
+        else:
+            st.info("추출 버튼을 눌러주세요.")
+
+# ── 5: Q&A ──
+t = tab_for(5)
+if t:
+    with t:
+        question = st.text_input("질문 입력", placeholder="에이블에게 질문하기", label_visibility="collapsed")
+        if st.button("질문하기", key="btn_qa"):
+            with st.spinner("답변 생성 중..."):
+                ref = meeting_text + "\n\n" + "\n\n".join(
+                    [st.session_state.get(k, "") for k in RESULT_KEYS if st.session_state.get(k)])
+                st.session_state["qa_result"] = ask_able(question, ref)
+        if st.session_state.get("qa_result"):
+            st.markdown(st.session_state["qa_result"])
+        else:
+            st.info("질문을 입력하고 버튼을 눌러주세요.")
+
+# ── 6: 이메일 ──
+t = tab_for(6)
+if t:
+    with t:
+        e1, e2 = st.columns(2)
+        with e1:
+            r_name  = st.text_input("수신자명", value="팀장님")
+            r_email = st.text_input("수신자 이메일", value="")
+        with e2:
+            s_name  = st.text_input("발신자명", value="에이블")
+            subject = st.text_input("이메일 제목", value="[에이블 브리핑] 회의 정리")
+        if st.button("이메일 초안 생성", key="btn_email"):
+            with st.spinner("초안 생성 중..."):
+                st.session_state["email_draft_result"] = make_email_draft(meeting_text, r_name, s_name)
+        if st.session_state.get("email_draft_result"):
+            body = st.text_area("이메일 본문", value=st.session_state["email_draft_result"], height=360)
+            dl_col, send_col = st.columns(2)
+            with dl_col:
+                st.download_button("⬇ TXT 다운로드", data=body,
+                    file_name="able_email.txt", mime="text/plain", use_container_width=True)
+            with send_col:
+                if st.button("SendGrid 발송", use_container_width=True):
+                    if not SENDGRID_API_KEY:
+                        st.error("SENDGRID_API_KEY가 없습니다.")
+                    elif "@" not in (r_email or ""):
+                        st.error("이메일 주소를 확인해주세요.")
+                    else:
+                        with st.spinner("발송 중..."):
+                            headers = {"Authorization": f"Bearer {SENDGRID_API_KEY}", "Content-Type": "application/json"}
+                            payload = {
+                                "personalizations": [{"to": [{"email": r_email}], "subject": subject}],
+                                "from": {"email": EMAIL_ADDRESS},
+                                "content": [{"type": "text/plain", "value": body}],
+                            }
+                            resp = requests.post("https://api.sendgrid.com/v3/mail/send",
+                                headers=headers, json=payload, timeout=20)
+                            if resp.status_code == 202:
+                                st.success("발송 완료!")
+                            else:
+                                st.error(f"발송 실패: {resp.text}")
+        else:
+            st.info("초안 생성 버튼을 눌러주세요.")
+
+# ── 7: 알림 메시지 ──
+t = tab_for(7)
+if t:
+    with t:
+        if st.button("알림 메시지 생성", key="btn_notify", use_container_width=True):
+            with st.spinner("메시지 생성 중..."):
+                st.session_state["notify_result"] = generate_notify_messages(meeting_text)
+        if st.session_state.get("notify_result"):
+            raw = st.session_state["notify_result"]
+            blocks = re.split(r"(?=##\s)", raw.strip())
+            for block in blocks:
+                if not block.strip(): continue
+                lines = block.strip().split("\n")
+                title = lines[0].replace("##", "").strip()
+                body  = "\n".join(lines[1:]).strip().lstrip("-").strip()
+                st.markdown(
+                    f'<div class="n-card"><div class="n-card-title">📣 {title}</div>'
+                    f'<div class="n-card-body">{body.replace(chr(10), "<br>")}</div></div>',
+                    unsafe_allow_html=True,
+                )
+            st.download_button("⬇ 알림 TXT 다운로드", data=raw,
+                file_name="able_notify.txt", mime="text/plain", use_container_width=True)
+        else:
+            st.info("알림 메시지 생성 버튼을 눌러주세요.")
+
+# ══════════════════════════════════════════════════════════════
+# DOWNLOAD ALL
+# ══════════════════════════════════════════════════════════════
+st.markdown("---")
+section_map = [
+    ("# 회의 요약", "summary_result"), ("# 담당자 과제", "tasks_result"),
+    ("# 리브랜딩 인사이트", "branding_result"), ("# 실행·리스크", "action_risk_result"),
+    ("# 결정사항", "decisions_result"), ("# Q&A", "qa_result"),
+    ("# 알림 메시지", "notify_result"), ("# 이메일 초안", "email_draft_result"),
+]
+report = "\n\n".join([f"{h}\n\n{st.session_state[k]}" for h, k in section_map if st.session_state.get(k)])
+if report.strip():
+    st.download_button("⬇ 전체 분석 결과 Markdown 다운로드", data=report,
+        file_name="able_report.md", mime="text/markdown", use_container_width=True)
