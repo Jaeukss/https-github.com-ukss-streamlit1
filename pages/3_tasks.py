@@ -65,6 +65,15 @@ st.markdown("""
 .next-action strong { color:#7C5CFF; }
 @media (max-width: 900px) { .flow-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 640px) { .flow-grid { grid-template-columns: 1fr; } }
+
+/* 수정사항 저장 버튼 한 줄 표시 */
+.stButton > button,
+.stButton > button * {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    line-height: 1.15 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -113,22 +122,24 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-
-st.markdown("""
-<style>
-/* 업무 대시보드: 회의록에서 업무 추출하기 expander 헤더 글씨 표시 */
-[data-testid="stExpander"] summary,
-[data-testid="stExpander"] summary * {
-    color: #FFFFFF !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 # ══════════════════════════════════════════════════════════════
 # UPLOAD & EXTRACT
 # ══════════════════════════════════════════════════════════════
 if "tasks" not in st.session_state:
     st.session_state["tasks"] = []
+
+
+st.markdown("""
+<style>
+/* 요청 수정: 회의록에서 업무 추출하기 expander 헤더 글씨 보이게 */
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary *,
+[data-testid="stExpander"] summary p,
+[data-testid="stExpander"] summary span {
+    color: #FFFFFF !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 with st.expander("📁 회의록에서 업무 추출하기", expanded=not bool(st.session_state["tasks"])):
     # Pull from existing meeting text if available
@@ -236,7 +247,7 @@ with view_tab1:
         },
     )
 
-    save_col, reset_col, _ = st.columns([1, 1, 4])
+    save_col, reset_col, _ = st.columns([1.45, 1, 3.55])
     with save_col:
         if st.button("💾 수정사항 저장", use_container_width=True):
             st.session_state["tasks"] = edited.to_dict("records")

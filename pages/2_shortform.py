@@ -54,55 +54,54 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 
+
 st.markdown("""
 <style>
-/* 숏폼 스튜디오: 참고 회의록 expander 헤더 글씨 표시 */
+/* 요청 수정: 참고 회의록 expander 헤더 글씨 보이게 */
 [data-testid="stExpander"] summary,
-[data-testid="stExpander"] summary * {
+[data-testid="stExpander"] summary *,
+[data-testid="stExpander"] summary p,
+[data-testid="stExpander"] summary span {
     color: #FFFFFF !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Reference meeting text ──
-if "meeting_text" not in st.session_state:
-    st.session_state["meeting_text"] = ""
-
+# ── Reference meeting text (read-only pull from session) ──
 meeting_text = st.session_state.get("meeting_text", "")
 if not meeting_text.strip():
-    st.warning("회의 분석 대시보드에서 회의록을 먼저 입력해주세요. 여기서 직접 입력하려면 아래 박스를 사용하세요.")
+    st.markdown(
+        '<div class="able-warning-black">회의 분석 대시보드에서 회의록을 먼저 입력해주세요. 여기서 직접 입력하려면 아래 박스를 사용하세요.</div>',
+        unsafe_allow_html=True,
+    )
+
+if "sf_meeting_ref" not in st.session_state:
+    st.session_state["sf_meeting_ref"] = meeting_text
 
 with st.expander("📝 참고 회의록 (직접 입력 및 수정 가능)", expanded=not bool(meeting_text.strip())):
-    up_col, txt_col = st.columns([1, 2])
+    uploaded_ref = st.file_uploader(
+        "참고 회의록 TXT 파일 업로드",
+        type=["txt", "md"],
+        key="sf_ref_upload",
+    )
+    if uploaded_ref:
+        text_from_file = uploaded_ref.read().decode("utf-8")
+        if st.session_state.get("sf_last_uploaded") != uploaded_ref.name:
+            st.session_state["sf_meeting_ref"] = text_from_file
+            st.session_state["meeting_text"] = text_from_file
+            st.session_state["sf_last_uploaded"] = uploaded_ref.name
+            st.rerun()
 
-    with up_col:
-        uploaded_ref = st.file_uploader(
-            "참고 회의록 파일 업로드 (txt / md)",
-            type=["txt", "md"],
-            label_visibility="collapsed",
-            key="sf_ref_upload",
-        )
-
-    with txt_col:
-        if uploaded_ref:
-            ref_text = uploaded_ref.read().decode("utf-8")
-            if st.session_state.get("last_sf_ref_upload") != uploaded_ref.name:
-                st.session_state["meeting_text"] = ref_text
-                st.session_state["last_sf_ref_upload"] = uploaded_ref.name
-                st.rerun()
-
-        st.text_area(
-            "참고 회의록",
-            height=150,
-            key="meeting_text",
-            placeholder="숏폼 전략의 기반이 될 회의록을 입력하세요.",
-            label_visibility="collapsed",
-        )
-
+    meeting_text = st.text_area(
+        "회의록",
+        height=150,
+        label_visibility="collapsed",
+        key="sf_meeting_ref",
+        placeholder="숏폼 전략의 기반이 될 회의록을 입력하세요.",
+    )
     if st.button("이 내용으로 저장", key="sf_save_ref"):
+        st.session_state["meeting_text"] = meeting_text
         st.success("저장됐어요!")
-
-meeting_text = st.session_state.get("meeting_text", "")
 
 st.markdown("---")
 
