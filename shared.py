@@ -743,88 +743,108 @@ section[data-testid="stSidebar"] textarea { min-height:70px !important; font-siz
 section[data-testid="stSidebar"] .stExpander { border-color:#E5DDF7 !important; }
 
 
-/* ── REQUESTED UI FIX ONLY ── */
-/* 회의 분석 대시보드: 회의록 업로드 및 입력 제목 */
-.meeting-card-title {
-    text-align: center !important;
-    font-size: 0.96rem !important;
-    line-height: 1.35 !important;
-    letter-spacing: 0.04em !important;
-    margin-bottom: 0.35rem !important;
-    color: #211A32 !important;
-}
-.meeting-card-desc {
-    text-align: center !important;
-    font-size: 0.78rem !important;
-    line-height: 1.5 !important;
-    color: #6F6682 !important;
-    margin-bottom: 0.85rem !important;
-}
-
-/* 숏폼 스튜디오: 참고 회의록 업로드 및 입력 안내 */
-.shortform-input-head {
-    background: #FFFFFF;
-    border: 1px solid #E5DDF7;
-    border-radius: 14px;
-    padding: 1rem 1.2rem;
-    margin: 0.8rem 0 0.9rem;
-    text-align: center;
-}
-.shortform-input-title {
-    font-size: 0.96rem;
-    font-weight: 800;
-    color: #211A32 !important;
-    margin-bottom: 0.35rem;
-}
-.shortform-input-desc {
-    font-size: 0.78rem;
-    color: #6F6682 !important;
-    line-height: 1.5;
-}
-
-/* 파일 업로더의 Upload 버튼은 다크 버튼이므로 흰 글자로 고정 */
-[data-testid="stFileUploader"] button,
-[data-testid="stFileUploader"] button *,
-[data-testid="stFileUploader"] [role="button"],
-[data-testid="stFileUploader"] [role="button"] * {
-    color: #FFFFFF !important;
-}
-
-/* 파일 업로더 라벨/설명은 본문색으로 표시 */
-[data-testid="stFileUploader"] label,
-[data-testid="stFileUploader"] label *,
-[data-testid="stFileUploader"] small,
-[data-testid="stFileUploader"] small * {
+/* ── READABILITY FIX: prevent white text on light background ── */
+[data-testid="stMarkdownContainer"],
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] span,
+[data-testid="stMarkdownContainer"] li,
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] p,
+[data-testid="stCaptionContainer"] span,
+[data-testid="stWidgetLabel"],
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] span,
+label,
+label p,
+label span {
     color: #211A32 !important;
 }
 
-/* 에이블 챗봇의 form submit 버튼: 실행 / STT만 변환 / 대화 초기화 */
-[data-testid="stFormSubmitButton"] button,
-[data-testid="stFormSubmitButton"] button * {
-    color: #FFFFFF !important;
-}
-
-/* 다운로드 버튼은 다크 버튼일 때 글자가 묻히지 않도록 흰색 고정 */
-.stDownloadButton > button,
-.stDownloadButton > button * {
-    color: #FFFFFF !important;
-}
-
-/* Expander 헤더는 현재 앱에서 다크 배경이므로 흰 글자로 표시 */
-[data-testid="stExpander"] summary,
-[data-testid="stExpander"] summary *,
-.streamlit-expanderHeader,
-.streamlit-expanderHeader * {
-    color: #FFFFFF !important;
-}
-
-/* 입력창 placeholder는 흰 배경에서 보이도록 회색 계열로 고정 */
+/* Placeholder text */
 input::placeholder,
 textarea::placeholder,
 .stTextInput input::placeholder,
 .stTextArea textarea::placeholder {
     color: #9A90AA !important;
     opacity: 1 !important;
+}
+
+/* Expander labels: STT, TTS, 참고 회의록 등 */
+[data-testid="stExpander"] details summary,
+[data-testid="stExpander"] details summary *,
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary *,
+.streamlit-expanderHeader,
+.streamlit-expanderHeader * {
+    color: #211A32 !important;
+}
+
+/* Radio / Checkbox / Selectbox */
+div[data-testid="stRadio"] label,
+div[data-testid="stRadio"] label *,
+div[data-testid="stCheckbox"] label,
+div[data-testid="stCheckbox"] label *,
+div[data-testid="stSelectbox"] label,
+div[data-testid="stSelectbox"] label * {
+    color: #211A32 !important;
+}
+
+/* Text inputs and search keyword fields */
+div[data-testid="stTextInput"] label,
+div[data-testid="stTextInput"] label *,
+div[data-testid="stTextArea"] label,
+div[data-testid="stTextArea"] label *,
+div[data-testid="stTextInput"] input,
+div[data-testid="stTextArea"] textarea {
+    color: #211A32 !important;
+}
+
+/* Alert boxes */
+[data-testid="stAlert"],
+[data-testid="stAlert"] *,
+.stAlert,
+.stAlert * {
+    color: #211A32 !important;
+}
+
+/* Download and expander buttons */
+.stDownloadButton > button,
+.stDownloadButton > button *,
+.stButton > button,
+.stButton > button * {
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
+}
+
+/* Meeting input area */
+.meeting-input-head {
+    background: #FFFFFF;
+    border: 1px solid #E5DDF7;
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.85rem;
+}
+.meeting-input-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #211A32 !important;
+    margin-bottom: 0.25rem;
+}
+.meeting-input-desc {
+    font-size: 0.78rem;
+    color: #6F6682 !important;
+    line-height: 1.5;
+}
+.meeting-char-count {
+    color: #6F6682 !important;
+    font-size: 0.74rem;
+    text-align: right;
+    padding-top: 0.8rem;
+}
+
+/* File uploader label readability */
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] label * {
+    color: #211A32 !important;
 }
 
 </style>
