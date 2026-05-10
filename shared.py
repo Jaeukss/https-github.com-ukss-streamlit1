@@ -743,81 +743,46 @@ section[data-testid="stSidebar"] textarea { min-height:70px !important; font-siz
 section[data-testid="stSidebar"] .stExpander { border-color:#E5DDF7 !important; }
 
 
-/* ── FINAL UI READABILITY FIX ── */
-
-/* 기본 텍스트 가독성 */
-[data-testid="stMarkdownContainer"],
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] span,
-[data-testid="stMarkdownContainer"] li,
-[data-testid="stCaptionContainer"],
-[data-testid="stCaptionContainer"] p,
-[data-testid="stCaptionContainer"] span,
-label,
-label p,
-label span {
-    color: #211A32 !important;
-}
-
-/* 입력창 placeholder */
-input::placeholder,
-textarea::placeholder,
-.stTextInput input::placeholder,
-.stTextArea textarea::placeholder {
-    color: #9A90AA !important;
-    opacity: 1 !important;
-}
-
-/* Expander 라벨: STT, TTS, 참고 회의록 등 */
-[data-testid="stExpander"] summary,
-[data-testid="stExpander"] summary *,
-.streamlit-expanderHeader,
-.streamlit-expanderHeader * {
-    color: #211A32 !important;
-}
-
-/* Radio / Checkbox / Selectbox 라벨 */
-div[data-testid="stRadio"] label,
-div[data-testid="stRadio"] label *,
-div[data-testid="stCheckbox"] label,
-div[data-testid="stCheckbox"] label *,
-div[data-testid="stSelectbox"] label,
-div[data-testid="stSelectbox"] label *,
-div[data-testid="stTextInput"] label,
-div[data-testid="stTextInput"] label *,
-div[data-testid="stTextArea"] label,
-div[data-testid="stTextArea"] label * {
-    color: #211A32 !important;
-}
-
-/* Alert 박스 */
-[data-testid="stAlert"],
-[data-testid="stAlert"] *,
-.stAlert,
-.stAlert * {
-    color: #211A32 !important;
-}
-
-/* 일반 버튼: 줄바꿈/밀림 방지 */
-.stButton > button {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1.15 !important;
-    white-space: nowrap !important;
-    word-break: keep-all !important;
+/* ── REQUESTED UI FIX ONLY ── */
+/* 회의 분석 대시보드: 회의록 업로드 및 입력 제목 */
+.meeting-card-title {
     text-align: center !important;
-    min-height: 44px !important;
+    font-size: 0.96rem !important;
+    line-height: 1.35 !important;
+    letter-spacing: 0.04em !important;
+    margin-bottom: 0.35rem !important;
+    color: #211A32 !important;
+}
+.meeting-card-desc {
+    text-align: center !important;
+    font-size: 0.78rem !important;
+    line-height: 1.5 !important;
+    color: #6F6682 !important;
+    margin-bottom: 0.85rem !important;
 }
 
-/* 기본 버튼 안의 글자 */
-.stButton > button * {
-    line-height: 1.15 !important;
-    white-space: nowrap !important;
-    word-break: keep-all !important;
+/* 숏폼 스튜디오: 참고 회의록 업로드 및 입력 안내 */
+.shortform-input-head {
+    background: #FFFFFF;
+    border: 1px solid #E5DDF7;
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    margin: 0.8rem 0 0.9rem;
+    text-align: center;
+}
+.shortform-input-title {
+    font-size: 0.96rem;
+    font-weight: 800;
+    color: #211A32 !important;
+    margin-bottom: 0.35rem;
+}
+.shortform-input-desc {
+    font-size: 0.78rem;
+    color: #6F6682 !important;
+    line-height: 1.5;
 }
 
-/* 파일 업로더 버튼은 Streamlit 기본 다크 버튼이라 흰 글자로 유지 */
+/* 파일 업로더의 Upload 버튼은 다크 버튼이므로 흰 글자로 고정 */
 [data-testid="stFileUploader"] button,
 [data-testid="stFileUploader"] button *,
 [data-testid="stFileUploader"] [role="button"],
@@ -825,7 +790,7 @@ div[data-testid="stTextArea"] label * {
     color: #FFFFFF !important;
 }
 
-/* 파일 업로더 설명/라벨은 본문색 */
+/* 파일 업로더 라벨/설명은 본문색으로 표시 */
 [data-testid="stFileUploader"] label,
 [data-testid="stFileUploader"] label *,
 [data-testid="stFileUploader"] small,
@@ -833,44 +798,33 @@ div[data-testid="stTextArea"] label * {
     color: #211A32 !important;
 }
 
-/* 다운로드 버튼은 다크 버튼으로 보일 때가 많아 흰 글자로 고정 */
+/* 에이블 챗봇의 form submit 버튼: 실행 / STT만 변환 / 대화 초기화 */
+[data-testid="stFormSubmitButton"] button,
+[data-testid="stFormSubmitButton"] button * {
+    color: #FFFFFF !important;
+}
+
+/* 다운로드 버튼은 다크 버튼일 때 글자가 묻히지 않도록 흰색 고정 */
 .stDownloadButton > button,
 .stDownloadButton > button * {
     color: #FFFFFF !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1.15 !important;
-    white-space: nowrap !important;
-    word-break: keep-all !important;
 }
 
-/* 회의록 업로드 및 입력 영역 */
-.meeting-input-head {
-    background: #FFFFFF;
-    border: 1px solid #E5DDF7;
-    border-radius: 14px;
-    padding: 1.05rem 1.3rem;
-    margin-bottom: 0.9rem;
-    text-align: center;
+/* Expander 헤더는 현재 앱에서 다크 배경이므로 흰 글자로 표시 */
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary *,
+.streamlit-expanderHeader,
+.streamlit-expanderHeader * {
+    color: #FFFFFF !important;
 }
-.meeting-input-title {
-    font-size: 1.02rem;
-    font-weight: 800;
-    color: #211A32 !important;
-    margin-bottom: 0.35rem;
-    letter-spacing: -0.01em;
-}
-.meeting-input-desc {
-    font-size: 0.8rem;
-    color: #6F6682 !important;
-    line-height: 1.55;
-}
-.meeting-char-count {
-    color: #6F6682 !important;
-    font-size: 0.74rem;
-    text-align: right;
-    padding-top: 0.8rem;
+
+/* 입력창 placeholder는 흰 배경에서 보이도록 회색 계열로 고정 */
+input::placeholder,
+textarea::placeholder,
+.stTextInput input::placeholder,
+.stTextArea textarea::placeholder {
+    color: #9A90AA !important;
+    opacity: 1 !important;
 }
 
 </style>

@@ -50,22 +50,17 @@ st.markdown(f"""
 # MEETING INPUT SECTION
 # ══════════════════════════════════════════════════════════════
 with st.container():
-    st.markdown("""
-    <div class="meeting-input-head">
-        <div class="meeting-input-title">회의록 업로드 및 입력</div>
-        <div class="meeting-input-desc">TXT/MD 파일을 업로드하거나 회의록 내용을 직접 입력한 뒤 분석을 실행합니다.</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('''
+    <div class="card">
+        <div class="card-title meeting-card-title">회의록 업로드 및 입력</div>
+        <div class="meeting-card-desc">TXT/MD 파일을 업로드하거나 회의록 내용을 직접 입력한 뒤 분석을 실행합니다.</div>
+    ''', unsafe_allow_html=True)
 
     if "meeting_text" not in st.session_state:
         st.session_state["meeting_text"] = DEFAULT_MEETING_TEXT
 
-    uploaded_file = st.file_uploader(
-        "회의록 파일 업로드 (TXT / MD)",
-        type=["txt", "md"],
-        help="TXT 또는 MD 형식의 회의록 파일을 업로드하면 아래 입력창에 자동 반영됩니다.",
-    )
-
+    # File upload
+    uploaded_file = st.file_uploader("파일 업로드 (txt / md)", type=["txt", "md"], label_visibility="collapsed")
     if uploaded_file:
         text_from_file = uploaded_file.read().decode("utf-8")
         if st.session_state.get("last_uploaded") != uploaded_file.name:
@@ -74,19 +69,17 @@ with st.container():
             clear_results()
             st.rerun()
 
+    # STT는 회의록 입력 바로 위가 가장 자연스럽습니다.
+    # 음성 회의/녹음 파일 → 텍스트 회의록 → 기존 분석 흐름으로 이어집니다.
     with st.expander("🎙️ 음성 입력 / STT", expanded=False):
-        st.caption("음성 회의나 녹음 파일을 텍스트 회의록으로 변환해 아래 입력창에 반영합니다.")
+        st.caption("마이크로 녹음하거나 음성 파일을 올리면 회의록 입력창에 텍스트로 반영됩니다.")
         audio_source = None
         if hasattr(st, "audio_input"):
             audio_source = st.audio_input("회의 음성 녹음", key="meeting_audio_input")
         else:
-            audio_source = st.file_uploader(
-                "음성 파일 업로드 (wav / mp3 / m4a / webm)",
-                type=["wav", "mp3", "m4a", "webm"],
-                key="meeting_audio_upload",
-            )
+            audio_source = st.file_uploader("음성 파일 업로드 (wav / mp3 / m4a)", type=["wav", "mp3", "m4a", "webm"], key="meeting_audio_upload")
 
-        stt_col1, stt_col2 = st.columns([1.2, 3])
+        stt_col1, stt_col2 = st.columns([1, 2])
         with stt_col1:
             if st.button("음성을 텍스트로 변환", key="btn_stt", use_container_width=True):
                 if not audio_source:
@@ -97,40 +90,37 @@ with st.container():
                     if transcript.strip():
                         st.session_state["meeting_text"] = transcript
                         clear_results()
-                        st.success("STT 변환 완료. 입력창에 반영했습니다.")
+                        st.success("STT 변환 완료! 입력창에 반영했습니다.")
                         st.rerun()
                     else:
                         st.warning("변환된 텍스트가 없습니다. 음성 파일을 다시 확인해주세요.")
         with stt_col2:
-            st.caption("STT 결과는 아래 회의록 내용 입력창으로 들어갑니다.")
+            st.caption("회의 분석 대시보드의 입력 영역에 넣는 것이 가장 효율적이라 이 위치에 배치했습니다.")
 
-    btn_col1, btn_col2, count_col = st.columns([1.35, 1.1, 3.55])
-    with btn_col1:
+    col_ex, col_clear = st.columns([1, 1])
+    with col_ex:
         if st.button("예시 회의록 불러오기", use_container_width=True):
             st.session_state["meeting_text"] = DEFAULT_MEETING_TEXT
             clear_results()
             st.rerun()
-    with btn_col2:
+    with col_clear:
         if st.button("입력창 비우기", use_container_width=True):
             st.session_state["meeting_text"] = ""
             clear_results()
             st.rerun()
 
     meeting_text = st.text_area(
-        "회의록 내용",
+        "회의록",
         key="meeting_text",
-        height=190,
+        height=180,
         placeholder="회의록 내용을 붙여넣거나 위에서 파일을 업로드하세요.",
+        label_visibility="collapsed",
     )
-
-    with count_col:
-        st.markdown(
-            f'<div class="meeting-char-count">현재 입력 글자 수: {len(meeting_text):,}자</div>',
-            unsafe_allow_html=True,
-        )
+    st.markdown(f'<div style="font-size:0.72rem;color:#35334D;margin-top:4px;">{len(meeting_text):,}자</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ── Top action row: key actions aligned in one line ──
-run_col, length_col, kw_btn_col, reset_col = st.columns([3.0, 1.6, 1.8, 1.2])
+run_col, length_col, kw_btn_col, reset_col = st.columns([3.2, 2.1, 1.25, 1.25])
 with run_col:
     st.markdown('<div class="btn-primary">', unsafe_allow_html=True)
     run_all = st.button("⚡ 전체 분석 실행", use_container_width=True)
