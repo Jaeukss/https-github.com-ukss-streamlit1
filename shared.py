@@ -742,6 +742,111 @@ hr { border-color: #E6DDF7 !important; }
 section[data-testid="stSidebar"] textarea { min-height:70px !important; font-size:0.78rem !important; }
 section[data-testid="stSidebar"] .stExpander { border-color:#E5DDF7 !important; }
 
+
+/* ── READABILITY FIX: prevent white text on light background ── */
+[data-testid="stMarkdownContainer"],
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] span,
+[data-testid="stMarkdownContainer"] li,
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] p,
+[data-testid="stCaptionContainer"] span,
+[data-testid="stWidgetLabel"],
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] span,
+label,
+label p,
+label span {
+    color: #211A32 !important;
+}
+
+/* Placeholder text */
+input::placeholder,
+textarea::placeholder,
+.stTextInput input::placeholder,
+.stTextArea textarea::placeholder {
+    color: #9A90AA !important;
+    opacity: 1 !important;
+}
+
+/* Expander labels: STT, TTS, 참고 회의록 등 */
+[data-testid="stExpander"] details summary,
+[data-testid="stExpander"] details summary *,
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary *,
+.streamlit-expanderHeader,
+.streamlit-expanderHeader * {
+    color: #211A32 !important;
+}
+
+/* Radio / Checkbox / Selectbox */
+div[data-testid="stRadio"] label,
+div[data-testid="stRadio"] label *,
+div[data-testid="stCheckbox"] label,
+div[data-testid="stCheckbox"] label *,
+div[data-testid="stSelectbox"] label,
+div[data-testid="stSelectbox"] label * {
+    color: #211A32 !important;
+}
+
+/* Text inputs and search keyword fields */
+div[data-testid="stTextInput"] label,
+div[data-testid="stTextInput"] label *,
+div[data-testid="stTextArea"] label,
+div[data-testid="stTextArea"] label *,
+div[data-testid="stTextInput"] input,
+div[data-testid="stTextArea"] textarea {
+    color: #211A32 !important;
+}
+
+/* Alert boxes */
+[data-testid="stAlert"],
+[data-testid="stAlert"] *,
+.stAlert,
+.stAlert * {
+    color: #211A32 !important;
+}
+
+/* Download and expander buttons */
+.stDownloadButton > button,
+.stDownloadButton > button *,
+.stButton > button,
+.stButton > button * {
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
+}
+
+/* Meeting input area */
+.meeting-input-head {
+    background: #FFFFFF;
+    border: 1px solid #E5DDF7;
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.85rem;
+}
+.meeting-input-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #211A32 !important;
+    margin-bottom: 0.25rem;
+}
+.meeting-input-desc {
+    font-size: 0.78rem;
+    color: #6F6682 !important;
+    line-height: 1.5;
+}
+.meeting-char-count {
+    color: #6F6682 !important;
+    font-size: 0.74rem;
+    text-align: right;
+    padding-top: 0.8rem;
+}
+
+/* File uploader label readability */
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] label * {
+    color: #211A32 !important;
+}
+
 </style>
 """
 
