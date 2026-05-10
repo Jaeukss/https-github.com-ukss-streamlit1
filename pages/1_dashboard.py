@@ -86,7 +86,7 @@ with st.container():
                 key="meeting_audio_upload",
             )
 
-        stt_col1, stt_col2 = st.columns([1, 2.6])
+        stt_col1, stt_col2 = st.columns([1.2, 3])
         with stt_col1:
             if st.button("음성을 텍스트로 변환", key="btn_stt", use_container_width=True):
                 if not audio_source:
@@ -104,7 +104,7 @@ with st.container():
         with stt_col2:
             st.caption("STT 결과는 아래 회의록 내용 입력창으로 들어갑니다.")
 
-    btn_col1, btn_col2, count_col = st.columns([1, 1, 4])
+    btn_col1, btn_col2, count_col = st.columns([1.35, 1.1, 3.55])
     with btn_col1:
         if st.button("예시 회의록 불러오기", use_container_width=True):
             st.session_state["meeting_text"] = DEFAULT_MEETING_TEXT
@@ -130,7 +130,7 @@ with st.container():
         )
 
 # ── Top action row: key actions aligned in one line ──
-run_col, length_col, kw_btn_col, reset_col = st.columns([3.2, 2.1, 1.25, 1.25])
+run_col, length_col, kw_btn_col, reset_col = st.columns([3.0, 1.6, 1.8, 1.2])
 with run_col:
     st.markdown('<div class="btn-primary">', unsafe_allow_html=True)
     run_all = st.button("⚡ 전체 분석 실행", use_container_width=True)
