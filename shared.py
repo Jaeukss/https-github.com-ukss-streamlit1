@@ -742,6 +742,41 @@ hr { border-color: #E6DDF7 !important; }
 section[data-testid="stSidebar"] textarea { min-height:70px !important; font-size:0.78rem !important; }
 section[data-testid="stSidebar"] .stExpander { border-color:#E5DDF7 !important; }
 
+
+/* ── Exact requested text color fixes only ── */
+/* 1,4. STT expander and result TTS expander label text */
+[data-testid="stExpander"] details summary,
+[data-testid="stExpander"] details summary *,
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary *,
+.streamlit-expanderHeader,
+.streamlit-expanderHeader * {
+    color: #211A32 !important;
+}
+
+/* 2. 담당자 과제: 표 보기 / 체크리스트 radio option text */
+div[data-testid="stRadio"] label,
+div[data-testid="stRadio"] label *,
+div[data-testid="stRadio"] [role="radiogroup"] label,
+div[data-testid="stRadio"] [role="radiogroup"] label * {
+    color: #211A32 !important;
+}
+
+/* 5,7. 특정 안내 문구만 검정색으로 보이게 쓰는 박스 */
+.able-warning-black {
+    background: #FFFBEA;
+    border: 1px solid #F2E8A8;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    color: #211A32 !important;
+    font-size: 0.86rem;
+    line-height: 1.65;
+    margin: 0.75rem 0;
+}
+.able-warning-black * {
+    color: #211A32 !important;
+}
+
 </style>
 """
 
