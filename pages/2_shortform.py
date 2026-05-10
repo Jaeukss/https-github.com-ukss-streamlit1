@@ -53,6 +53,17 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+
+st.markdown("""
+<style>
+/* 숏폼 페이지 참고 회의록 expander 헤더 글씨 */
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary * {
+    color: #FFFFFF !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # ── Reference meeting text (read-only pull from session) ──
 meeting_text = st.session_state.get("meeting_text", "")
 if not meeting_text.strip():
