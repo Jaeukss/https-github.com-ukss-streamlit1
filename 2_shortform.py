@@ -53,35 +53,27 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Reference meeting text: dashboard meeting_text와 숏폼 페이지 입력값 동기화 ──
-dashboard_meeting_text = st.session_state.get("meeting_text", "")
+# ── Reference meeting text ──
+# 대시보드에서 업로드/입력한 회의록을 같은 session_state key로 직접 사용합니다.
+# 별도 key를 쓰지 않아 페이지 이동 시 회의록이 비어 보이는 문제를 방지합니다.
+if "meeting_text" not in st.session_state:
+    st.session_state["meeting_text"] = ""
 
-# sf_meeting_ref는 별도 key이므로, 대시보드 회의록이 바뀌면 최초 1회 동기화합니다.
-# 이렇게 해야 페이지 이동 시 숏폼 스튜디오에서 회의록이 빈 값으로 리셋되지 않습니다.
-if st.session_state.get("_sf_source_meeting_text") != dashboard_meeting_text:
-    st.session_state["sf_meeting_ref"] = dashboard_meeting_text
-    st.session_state["_sf_source_meeting_text"] = dashboard_meeting_text
-
-meeting_text = st.session_state.get("sf_meeting_ref", "")
-
-if not meeting_text.strip():
+if not st.session_state["meeting_text"].strip():
     st.warning("회의 분석 대시보드에서 회의록을 먼저 입력해주세요. 여기서 직접 입력하려면 아래 박스를 사용하세요.")
 
-with st.expander("📝 참고 회의록 (직접 입력 / 수정 가능)", expanded=not bool(meeting_text.strip())):
+with st.expander("📝 참고 회의록 (직접 입력 / 수정 가능)", expanded=not bool(st.session_state["meeting_text"].strip())):
     st.text_area(
         "회의록",
         height=150,
         label_visibility="collapsed",
-        key="sf_meeting_ref",
+        key="meeting_text",
         placeholder="숏폼 전략의 기반이 될 회의록을 입력하세요.",
     )
     if st.button("이 내용으로 저장", key="sf_save_ref"):
-        st.session_state["meeting_text"] = st.session_state.get("sf_meeting_ref", "")
-        st.session_state["_sf_source_meeting_text"] = st.session_state["meeting_text"]
-        meeting_text = st.session_state["meeting_text"]
         st.success("저장됐어요!")
 
-meeting_text = st.session_state.get("sf_meeting_ref", "")
+meeting_text = st.session_state.get("meeting_text", "")
 
 st.markdown("---")
 

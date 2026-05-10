@@ -743,7 +743,9 @@ section[data-testid="stSidebar"] textarea { min-height:70px !important; font-siz
 section[data-testid="stSidebar"] .stExpander { border-color:#E5DDF7 !important; }
 
 
-/* ── READABILITY FIX: prevent white text on light background ── */
+/* ── FINAL UI READABILITY FIX ── */
+
+/* 기본 텍스트 가독성 */
 [data-testid="stMarkdownContainer"],
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] span,
@@ -751,16 +753,13 @@ section[data-testid="stSidebar"] .stExpander { border-color:#E5DDF7 !important; 
 [data-testid="stCaptionContainer"],
 [data-testid="stCaptionContainer"] p,
 [data-testid="stCaptionContainer"] span,
-[data-testid="stWidgetLabel"],
-[data-testid="stWidgetLabel"] p,
-[data-testid="stWidgetLabel"] span,
 label,
 label p,
 label span {
     color: #211A32 !important;
 }
 
-/* Placeholder text */
+/* 입력창 placeholder */
 input::placeholder,
 textarea::placeholder,
 .stTextInput input::placeholder,
@@ -769,9 +768,7 @@ textarea::placeholder,
     opacity: 1 !important;
 }
 
-/* Expander labels: STT, TTS, 참고 회의록 등 */
-[data-testid="stExpander"] details summary,
-[data-testid="stExpander"] details summary *,
+/* Expander 라벨: STT, TTS, 참고 회의록 등 */
 [data-testid="stExpander"] summary,
 [data-testid="stExpander"] summary *,
 .streamlit-expanderHeader,
@@ -779,27 +776,21 @@ textarea::placeholder,
     color: #211A32 !important;
 }
 
-/* Radio / Checkbox / Selectbox */
+/* Radio / Checkbox / Selectbox 라벨 */
 div[data-testid="stRadio"] label,
 div[data-testid="stRadio"] label *,
 div[data-testid="stCheckbox"] label,
 div[data-testid="stCheckbox"] label *,
 div[data-testid="stSelectbox"] label,
-div[data-testid="stSelectbox"] label * {
-    color: #211A32 !important;
-}
-
-/* Text inputs and search keyword fields */
+div[data-testid="stSelectbox"] label *,
 div[data-testid="stTextInput"] label,
 div[data-testid="stTextInput"] label *,
 div[data-testid="stTextArea"] label,
-div[data-testid="stTextArea"] label *,
-div[data-testid="stTextInput"] input,
-div[data-testid="stTextArea"] textarea {
+div[data-testid="stTextArea"] label * {
     color: #211A32 !important;
 }
 
-/* Alert boxes */
+/* Alert 박스 */
 [data-testid="stAlert"],
 [data-testid="stAlert"] *,
 .stAlert,
@@ -807,44 +798,79 @@ div[data-testid="stTextArea"] textarea {
     color: #211A32 !important;
 }
 
-/* Download and expander buttons */
-.stDownloadButton > button,
-.stDownloadButton > button *,
-.stButton > button,
-.stButton > button * {
-    font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
+/* 일반 버튼: 줄바꿈/밀림 방지 */
+.stButton > button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    text-align: center !important;
+    min-height: 44px !important;
 }
 
-/* Meeting input area */
+/* 기본 버튼 안의 글자 */
+.stButton > button * {
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+}
+
+/* 파일 업로더 버튼은 Streamlit 기본 다크 버튼이라 흰 글자로 유지 */
+[data-testid="stFileUploader"] button,
+[data-testid="stFileUploader"] button *,
+[data-testid="stFileUploader"] [role="button"],
+[data-testid="stFileUploader"] [role="button"] * {
+    color: #FFFFFF !important;
+}
+
+/* 파일 업로더 설명/라벨은 본문색 */
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] label *,
+[data-testid="stFileUploader"] small,
+[data-testid="stFileUploader"] small * {
+    color: #211A32 !important;
+}
+
+/* 다운로드 버튼은 다크 버튼으로 보일 때가 많아 흰 글자로 고정 */
+.stDownloadButton > button,
+.stDownloadButton > button * {
+    color: #FFFFFF !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+}
+
+/* 회의록 업로드 및 입력 영역 */
 .meeting-input-head {
     background: #FFFFFF;
     border: 1px solid #E5DDF7;
     border-radius: 14px;
-    padding: 1rem 1.2rem;
-    margin-bottom: 0.85rem;
+    padding: 1.05rem 1.3rem;
+    margin-bottom: 0.9rem;
+    text-align: center;
 }
 .meeting-input-title {
-    font-size: 0.95rem;
+    font-size: 1.02rem;
     font-weight: 800;
     color: #211A32 !important;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.01em;
 }
 .meeting-input-desc {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     color: #6F6682 !important;
-    line-height: 1.5;
+    line-height: 1.55;
 }
 .meeting-char-count {
     color: #6F6682 !important;
     font-size: 0.74rem;
     text-align: right;
     padding-top: 0.8rem;
-}
-
-/* File uploader label readability */
-[data-testid="stFileUploader"] label,
-[data-testid="stFileUploader"] label * {
-    color: #211A32 !important;
 }
 
 </style>
