@@ -27,6 +27,44 @@ if not st.session_state.get("logged_in_user"):
     st.switch_page("app.py")
 
 st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
+
+# ── Radio / Checkbox / Selectbox text color fix ──
+# Streamlit 테마나 커스텀 CSS 충돌로 일부 옵션 글자가 흰색으로 보이는 문제 방지
+st.markdown("""
+<style>
+/* Radio option text color fix */
+div[data-testid="stRadio"] label,
+div[data-testid="stRadio"] label span,
+div[data-testid="stRadio"] label p,
+div[data-testid="stRadio"] [role="radiogroup"] label,
+div[data-testid="stRadio"] [role="radiogroup"] label span,
+div[data-testid="stRadio"] [role="radiogroup"] label p,
+div[data-testid="stRadio"] [role="radiogroup"] label div {
+    color: #211A32 !important;
+}
+
+/* Radio label title */
+div[data-testid="stRadio"] > label,
+div[data-testid="stRadio"] > label p {
+    color: #211A32 !important;
+}
+
+/* Checkbox text color fix */
+div[data-testid="stCheckbox"] label,
+div[data-testid="stCheckbox"] label span,
+div[data-testid="stCheckbox"] label p {
+    color: #211A32 !important;
+}
+
+/* Selectbox label text color fix */
+div[data-testid="stSelectbox"] label,
+div[data-testid="stSelectbox"] label span,
+div[data-testid="stSelectbox"] label p {
+    color: #211A32 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 render_sidebar(current_page="1_dashboard.py")
 
 user = st.session_state["logged_in_user"]
@@ -229,6 +267,7 @@ t = tab_for(1)
 if t:
     with t:
         view_mode = st.radio("보기 모드", ["📊 표 보기", "☑️ 체크리스트"], horizontal=True)
+
         if st.button("과제 추출", key="btn_tasks"):
             with st.spinner("생성 중..."):
                 st.session_state["tasks_result"] = extract_tasks_ai(meeting_text)
