@@ -4,6 +4,7 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import re
+import json
 import requests
 import streamlit as st
 from datetime import datetime
@@ -27,44 +28,6 @@ if not st.session_state.get("logged_in_user"):
     st.switch_page("app.py")
 
 st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
-
-# ── Radio / Checkbox / Selectbox text color fix ──
-# Streamlit 테마나 커스텀 CSS 충돌로 일부 옵션 글자가 흰색으로 보이는 문제 방지
-st.markdown("""
-<style>
-/* Radio option text color fix */
-div[data-testid="stRadio"] label,
-div[data-testid="stRadio"] label span,
-div[data-testid="stRadio"] label p,
-div[data-testid="stRadio"] [role="radiogroup"] label,
-div[data-testid="stRadio"] [role="radiogroup"] label span,
-div[data-testid="stRadio"] [role="radiogroup"] label p,
-div[data-testid="stRadio"] [role="radiogroup"] label div {
-    color: #211A32 !important;
-}
-
-/* Radio label title */
-div[data-testid="stRadio"] > label,
-div[data-testid="stRadio"] > label p {
-    color: #211A32 !important;
-}
-
-/* Checkbox text color fix */
-div[data-testid="stCheckbox"] label,
-div[data-testid="stCheckbox"] label span,
-div[data-testid="stCheckbox"] label p {
-    color: #211A32 !important;
-}
-
-/* Selectbox label text color fix */
-div[data-testid="stSelectbox"] label,
-div[data-testid="stSelectbox"] label span,
-div[data-testid="stSelectbox"] label p {
-    color: #211A32 !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 render_sidebar(current_page="1_dashboard.py")
 
 user = st.session_state["logged_in_user"]
@@ -87,7 +50,11 @@ st.markdown(f"""
 # MEETING INPUT SECTION
 # ══════════════════════════════════════════════════════════════
 with st.container():
-    st.markdown('<div class="card"><div class="card-title">회의록 입력</div>', unsafe_allow_html=True)
+    st.markdown('''
+    <div class="card">
+        <div class="card-title meeting-card-title">회의록 업로드 및 입력</div>
+        <div class="meeting-card-desc">TXT/MD 파일을 업로드하거나 회의록 내용을 직접 입력한 뒤 분석을 실행합니다.</div>
+    ''', unsafe_allow_html=True)
 
     if "meeting_text" not in st.session_state:
         st.session_state["meeting_text"] = DEFAULT_MEETING_TEXT
@@ -245,6 +212,16 @@ def tab_for(index):
             return tab_objects[pos]
     return None
 
+def state_to_text(value) -> str:
+    """session_state 값이 list/dict여도 Q&A와 다운로드에서 안전하게 문자열로 변환합니다."""
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    if isinstance(value, (list, dict, tuple)):
+        return json.dumps(value, ensure_ascii=False, indent=2)
+    return str(value)
+
 # ── 0: 회의 요약 ──
 t = tab_for(0)
 if t:
@@ -362,8 +339,12 @@ if t:
         question = st.text_input("질문 입력", placeholder="에이블에게 질문하기", label_visibility="collapsed")
         if st.button("질문하기", key="btn_qa"):
             with st.spinner("답변 생성 중..."):
-                ref = meeting_text + "\n\n" + "\n\n".join(
-                    [st.session_state.get(k, "") for k in RESULT_KEYS if st.session_state.get(k)])
+                ref_parts = [
+                    state_to_text(st.session_state.get(k))
+                    for k in RESULT_KEYS
+                    if st.session_state.get(k)
+                ]
+                ref = state_to_text(meeting_text) + "\n\n" + "\n\n".join(ref_parts)
                 st.session_state["qa_result"] = ask_able(question, ref)
         if st.session_state.get("qa_result"):
             st.markdown(st.session_state["qa_result"])
@@ -492,7 +473,11 @@ section_map = [
     ("# 알림 메시지", "notify_result"), ("# 이메일 초안", "email_draft_result"),
     ("# 관련 뉴스", "news_result"),
 ]
-report = "\n\n".join([f"{h}\n\n{st.session_state[k]}" for h, k in section_map if st.session_state.get(k)])
+report = "\n\n".join([
+    f"{h}\n\n{state_to_text(st.session_state.get(k))}"
+    for h, k in section_map
+    if st.session_state.get(k)
+])
 if report.strip():
     st.download_button("⬇ 전체 분석 결과 Markdown 다운로드", data=report,
         file_name="able_report.md", mime="text/markdown", use_container_width=True)
