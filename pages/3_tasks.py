@@ -225,7 +225,7 @@ with view_tab1:
         },
     )
 
-    save_col, reset_col, _ = st.columns([1.55, 1.15, 3.3])
+    save_col, reset_col, _ = st.columns([1, 1, 4])
     with save_col:
         if st.button("💾 수정사항 저장", use_container_width=True):
             st.session_state["tasks"] = edited.to_dict("records")

@@ -53,44 +53,35 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Reference meeting text upload / input ──
-if "meeting_text" not in st.session_state:
-    st.session_state["meeting_text"] = ""
+# ── Reference meeting text: dashboard meeting_text와 숏폼 페이지 입력값 동기화 ──
+dashboard_meeting_text = st.session_state.get("meeting_text", "")
 
-st.markdown("""
-<div class="shortform-input-head">
-    <div class="shortform-input-title">참고 회의록 업로드 및 입력</div>
-    <div class="shortform-input-desc">TXT/MD 파일을 업로드하거나 아래 박스에서 직접 입력·수정할 수 있습니다.</div>
-</div>
-""", unsafe_allow_html=True)
+# sf_meeting_ref는 별도 key이므로, 대시보드 회의록이 바뀌면 최초 1회 동기화합니다.
+# 이렇게 해야 페이지 이동 시 숏폼 스튜디오에서 회의록이 빈 값으로 리셋되지 않습니다.
+if st.session_state.get("_sf_source_meeting_text") != dashboard_meeting_text:
+    st.session_state["sf_meeting_ref"] = dashboard_meeting_text
+    st.session_state["_sf_source_meeting_text"] = dashboard_meeting_text
 
-uploaded_meeting_file = st.file_uploader(
-    "참고 텍스트 파일 업로드",
-    type=["txt", "md"],
-    key="shortform_meeting_upload",
-)
+meeting_text = st.session_state.get("sf_meeting_ref", "")
 
-if uploaded_meeting_file:
-    text_from_file = uploaded_meeting_file.read().decode("utf-8")
-    if st.session_state.get("last_shortform_uploaded") != uploaded_meeting_file.name:
-        st.session_state["meeting_text"] = text_from_file
-        st.session_state["last_shortform_uploaded"] = uploaded_meeting_file.name
-        st.rerun()
+if not meeting_text.strip():
+    st.warning("회의 분석 대시보드에서 회의록을 먼저 입력해주세요. 여기서 직접 입력하려면 아래 박스를 사용하세요.")
 
-if not st.session_state["meeting_text"].strip():
-    st.warning("회의 분석 대시보드에서 회의록을 먼저 입력하거나, 이 페이지에서 TXT/MD 파일을 업로드하세요.")
-
-with st.expander("📝 참고 회의록 (직접 입력 / 수정 가능)", expanded=not bool(st.session_state["meeting_text"].strip())):
+with st.expander("📝 참고 회의록 (직접 입력 / 수정 가능)", expanded=not bool(meeting_text.strip())):
     st.text_area(
         "회의록",
         height=150,
-        key="meeting_text",
+        label_visibility="collapsed",
+        key="sf_meeting_ref",
         placeholder="숏폼 전략의 기반이 될 회의록을 입력하세요.",
     )
     if st.button("이 내용으로 저장", key="sf_save_ref"):
+        st.session_state["meeting_text"] = st.session_state.get("sf_meeting_ref", "")
+        st.session_state["_sf_source_meeting_text"] = st.session_state["meeting_text"]
+        meeting_text = st.session_state["meeting_text"]
         st.success("저장됐어요!")
 
-meeting_text = st.session_state.get("meeting_text", "")
+meeting_text = st.session_state.get("sf_meeting_ref", "")
 
 st.markdown("---")
 
