@@ -56,12 +56,30 @@ st.markdown(f"""
 # ── Reference meeting text (read-only pull from session) ──
 meeting_text = st.session_state.get("meeting_text", "")
 if not meeting_text.strip():
-    st.warning("회의 분석 대시보드에서 회의록을 먼저 입력해주세요. 여기서 직접 입력하려면 아래 박스를 사용하세요.")
+    st.markdown(
+        '<div class="able-warning-black">회의 분석 대시보드에서 회의록을 먼저 입력해주세요. 여기서 직접 입력하려면 아래 박스를 사용하세요.</div>',
+        unsafe_allow_html=True,
+    )
 
-with st.expander("📝 참고 회의록 (직접 입력 / 수정 가능)", expanded=not bool(meeting_text.strip())):
+if "sf_meeting_ref" not in st.session_state:
+    st.session_state["sf_meeting_ref"] = meeting_text
+
+with st.expander("📝 참고 회의록 (직접 입력 및 수정 가능)", expanded=not bool(meeting_text.strip())):
+    uploaded_ref = st.file_uploader(
+        "참고 회의록 TXT 파일 업로드",
+        type=["txt", "md"],
+        key="sf_ref_upload",
+    )
+    if uploaded_ref:
+        text_from_file = uploaded_ref.read().decode("utf-8")
+        if st.session_state.get("sf_last_uploaded") != uploaded_ref.name:
+            st.session_state["sf_meeting_ref"] = text_from_file
+            st.session_state["meeting_text"] = text_from_file
+            st.session_state["sf_last_uploaded"] = uploaded_ref.name
+            st.rerun()
+
     meeting_text = st.text_area(
         "회의록",
-        value=meeting_text,
         height=150,
         label_visibility="collapsed",
         key="sf_meeting_ref",

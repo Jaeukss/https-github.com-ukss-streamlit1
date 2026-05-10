@@ -219,7 +219,10 @@ if submit:
             st.info(f"STT 인식 결과: {user_request}")
 
     if not user_request:
-        st.warning("텍스트를 입력하거나 음성을 녹음해주세요.")
+        st.markdown(
+            '<div class="able-warning-black">텍스트를 입력하거나 음성을 녹음해주세요.</div>',
+            unsafe_allow_html=True,
+        )
         st.stop()
 
     st.session_state["voice_chat_messages"].append({"role": "user", "content": user_request})

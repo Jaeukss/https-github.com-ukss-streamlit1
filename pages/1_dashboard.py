@@ -49,7 +49,10 @@ st.markdown(f"""
 # MEETING INPUT SECTION
 # ══════════════════════════════════════════════════════════════
 with st.container():
-    st.markdown('<div class="card"><div class="card-title">회의록 입력</div>', unsafe_allow_html=True)
+    st.markdown('''
+    <div class="card">
+        <div class="card-title" style="text-align:center;font-size:0.95rem;line-height:1.35;letter-spacing:0.04em;text-transform:none;color:#211A32;margin-bottom:0.65rem;">회의록 업로드 및 입력</div>
+    ''', unsafe_allow_html=True)
 
     if "meeting_text" not in st.session_state:
         st.session_state["meeting_text"] = DEFAULT_MEETING_TEXT
