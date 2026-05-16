@@ -306,7 +306,7 @@ streamlit run app.py
 **에이블 챗봇**  
 현재 앱의 회의록, 분석 결과, 업무 목록을 참고해 질문에 답변하는 챗봇 화면입니다. 텍스트와 음성 질문을 모두 지원합니다.
 
-세부 기능별 실행 화면은 `![docs/screenshots/]`[docs/screenshots](https://github.com/Jaeukss/https-github.com-ukss-minip3/tree/main/docs/screenshots) 폴더에 정리했습니다.
+세부 기능별 실행 화면은 [docs/screenshots](https://github.com/Jaeukss/https-github.com-ukss-minip3/tree/main/docs/screenshots) 폴더에 정리했습니다.
 
 ## 11. 프로젝트 결과
 
